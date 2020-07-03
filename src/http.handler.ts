@@ -30,7 +30,7 @@ export type HttpHandlerFunction<T, R> = (
 export const httpHandler = <T extends { [s: string]: any }, R extends any>(
   fn: HttpHandlerFunction<T, R>,
   defaultStatus: HttpStatusCode = HttpStatusCode.OK,
-  errorHandlingOptions: ErrorHandlingType = false,
+  errorHandlingOptions: ErrorHandlingType = [HttpStatusCode.BAD_REQUEST, HttpStatusCode.NETWORK_READ_TIMEOUT],
 ): ((
   event: APIGatewayEvent,
   context: Context,

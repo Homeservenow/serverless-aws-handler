@@ -1,0 +1,7 @@
+src
+.idea
+.prettier
+.travis.yml
+coverage/
+node_modules/
+test/

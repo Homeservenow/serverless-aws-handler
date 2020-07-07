@@ -57,13 +57,9 @@ workflows:
       - test:
           requires:
             - install
-      - lint:
-          requires:
-            - install
       - deploy:
           context: npm-publish
           requires:
-            - lint
             - test
           filters:
             branches:

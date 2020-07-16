@@ -3,7 +3,7 @@ import {
   httpResponseHandler,
   httpResponsePayloadHandler,
 } from "./http.response.handler";
-import { httpErrorHandler, ErrorHandlerFunction } from "./http.error.handler";
+import { httpErrorHandler } from "./http.error.handler";
 import { HttpStatusCode } from "./enum";
 import {
   APIGatewayEvent,
@@ -14,51 +14,21 @@ import {
 } from "aws-lambda";
 import {
   createLoggingHandler,
-  ErrorHandlingType,
-  LoggerFunction,
 } from "./logging.handler";
-import { ValidatorFunction } from "./validator";
-import { JSONParse, APIGatewayJsonEvent } from "./utils/json.parse";
-
-export type HttpHandlerFunction<T, R> = (
-  event?: APIGatewayEvent | APIGatewayJsonEvent<T>,
-  context?: Context,
-) => Promise<void | Partial<APIGatewayProxyResult> | APIGatewayProxyResult | R>;
-
-export type HttpHandlerOptions<R> = {
-  errorHandler?: ErrorHandlerFunction;
-  defaultStatusCode?: HttpStatusCode;
-  defaultHeaders?: { [s: string]: string };
-  logger?: LoggerFunction;
-  validator?: ValidatorFunction;
-  serialise?: {
-    input?: (value: APIGatewayEvent) => APIGatewayEvent;
-    output?: (value: R) => R | any;
-  };
-  loggingHandlingOpions?: ErrorHandlingType;
-};
-
-export type HttpHandlerFunctionOptions<T, R> =
-  | ({
-      handler: HttpHandlerFunction<T, R>;
-    } & HttpHandlerOptions<R>)
-  | HttpHandlerFunction<T, R>;
+import { JSONParse } from "./utils/json.parse";
+import {HttpHandlerFunctionOptions} from './interfaces';
 
 /**
  * A universal wrapper function response hander for aws handlers
- *
- * @param fn your custom handler function
- * @param defaultStatus Http Status Code
- * @param errorHandlingOptions
  */
-export const httpHandler = <T extends { [s: string]: any }, R extends any>(
-  handlerOptions: HttpHandlerFunctionOptions<T, R>,
+export const httpHandler = <RequestType extends any, ResponseType extends any>(
+  handlerOptions: HttpHandlerFunctionOptions<RequestType, ResponseType>,
 ): APIGatewayProxyHandler => (
   event: APIGatewayEvent,
   context: Context,
   callback: Callback<APIGatewayProxyResult>,
 ): Promise<APIGatewayProxyResult> => {
-  const options: HttpHandlerFunctionOptions<T, R> =
+  const options: HttpHandlerFunctionOptions<RequestType, ResponseType> =
     typeof handlerOptions === "function"
       ? {
           handler: handlerOptions,
@@ -67,8 +37,11 @@ export const httpHandler = <T extends { [s: string]: any }, R extends any>(
 
   const loggingHandler = options.logger || createLoggingHandler();
 
+  // TODO serialise output handler
+  // TODO apply default headers
+  // TODO use validator
+
   return new Promise(async (resolve) => {
-    // TODO add output serialisers
     try {
       const serialisedEvent =
         options?.serialise?.input(event) || JSONParse(event);
@@ -98,7 +71,7 @@ export const httpHandler = <T extends { [s: string]: any }, R extends any>(
         ],
         error,
       );
-      resolve(httpErrorHandler(error));
+      resolve(options.errorHandler ? options.errorHandler(error) : httpErrorHandler(error));
     }
   });
 };

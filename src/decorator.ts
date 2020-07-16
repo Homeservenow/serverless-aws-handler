@@ -1,4 +1,5 @@
-import { httpHandler, HttpHandlerOptions } from "./http.handler";
+import { httpHandler } from "./http.handler";
+import {HttpHandlerOptions} from './interfaces';
 
 export const HttpHandlerDecorator = <R>(
   options: HttpHandlerOptions<R>,

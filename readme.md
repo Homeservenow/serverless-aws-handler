@@ -3,243 +3,147 @@
 <a href="https://travis-ci.org/github/Homeservenow/severless-http-handler"><img src="https://api.travis-ci.org/Homeservenow/severless-http-handler.svg?branch=master" alt="travis"/></a>
 <a href='https://coveralls.io/github/Homeservenow/severless-http-handler?branch=master'><img src='https://coveralls.io/repos/github/Homeservenow/severless-http-handler/badge.svg?branch=master' alt='Coverage Status' /></a>
 
+Generic http handling wrapper function. 
 
-Proposal for universal http + error handling responses for lambda
+## Install 
 
-### Usage
+```bash
+$ yarn add @homeservenow/serverless-aws-handler
+```
 
-```ts
-import {HttpHandler, NotFoundException} from '@homeservenow/lambda';
+#### Features
+ - Error logging
+ - Error handling - throwable exceptions that correspond to status codes
+ - Payload serialisation
+ - Strong types :muscle:
+ 
+ ## Usage
+
+ ```typescript
+import {httpHandler, NotFoundException} from '@homeservenow/serverless-aws-handler';
 import {APIGatewayEvent} from 'aws-lambda';
+import {database} from './database';
 
-export const myHandler = httpHandler(async (event: APIGatewayEvent): Promise<{test: true} | never> => {
-    const object: {test: true} | undefined = await findObjectInDatabase(event.parameters.id);
-    
-    if (!object) {
+export const getCatHandler = httpHandler(async (event: APIGatewayEvent): Promise<CatInterface | never> => {
+    const cat = await database().findById(event?.pathParameters.id);
+
+    if (!cat) {
         throw new NotFoundException();
     }
 
-    return object;
+    return cat;
 });
+ ```
+
+ The above will result in either a 200 status code
+ ```JSON
+ {
+     "breed": "Tabby",
+     "lives": 7,
+     "name": "bob"
+ }
 ```
 
-#### Results
+Or if `NotFoundException` is thrown, a 404 status code (because of NotFoundException)
 
-**If there is no object**
-```json
+```JSON
 {
-    "statusCode": 404,
-    "message": "Not Found",
+    "message": "Not Found"
 }
 ```
 
-**If there is an object returned**
+#### Post method example
 
-```json
+You'll notive in this example, we're returning validation errors!
+
+```typescript
+import {httpHandler, NotFoundException, BadRequestException} from '@homeservenow/serverless-aws-handler';
+import {APIGatewayEvent} from 'aws-lambda';
+import {database} from './database';
+
+export const createCatHandler = httpHandler<Partial<CatInterface>>(async (
+        event: APIGatewayJsonEvent<Partial<CatInterface>>,
+    ): Promise<CatInterface | never> => {
+
+    const payload = event.json;
+
+    const validationErrors = {};
+
+    (["breed", "name", "lives"] as keyof CatInterface).forEach((property) => {
+        if (!payload[property]) {
+            validationErrors[property] = 'Cannot be blank!';
+        }
+    });
+
+    if (Object.keys(validationErrors).length >= 1) {
+        throw new BadRequestException('Validaiton Errors', validationErrors);
+    }
+
+    return database().create(payload);
+});
+```
+If validation errors occur then the handler will return a 400 status code plus the below body
+
+```JSON
 {
-    "statusCode": 200,
-    "body": {
-        "test": true
+    "message": "Validation Errors",
+    "data": {
+        "name": "Cannot be blank!"
     }
 }
 ```
 
-### Why? 
+## Available HTTP exceptions
 
-There's been a lot of occurrences of nested conditions to return a response payload. 
+========
+Exception name | status code | default message
+========
+`BadRequestException` | 400 | Bad Request
+`UnauthorizedException` | 401 | Unauthorized
+`ForbiddenException` | 403 | Forbidden
+`NotFoundException` | 404 | Not Found
+`UnProcessableEntityException` | 422 | 'Unprocessable Entity
+`InternalServerError` | 500 | Internal Server Error
 
-The idea of the httpHandler wrapper is to: 
-- Eliminate incorrect status code usage
-- Eliminate nested if statements
-- Multiple massive try catch blocks
-- Add default handling for non handled exceptions
-- Force the usage of strong types for http methods such removing the use of "any" for event types and context'
+## Future goals! 
 
-Eliminating the above will result in cleaner and more easy to read code as well enforced types reducing errors. As well as handling responses nicely and enabling other features to be added such as logging etc
+> This is currently in development! 
 
-```ts
-export const myHandler = (event: any) => {
-    if (this.notFound) {
-        return this.responseObject(202, {});
-    }
-}
-```
+Customable overrides of all methods provided by httpHandler. This includes 
 
-Or even 
+- Error Handling
+- Payload in/out serialisation
+- Logging
 
-```ts
-export const myHandler = (event: any) => {
-    const object = getObjectFromDatabase(event.parameters.id);
+This is the proposed structure
 
-    if (object) {
-
-        try {
-            ...
-        } catch (e) {
-            return this.responseObject(404, {});
-        }
-        
-        try {
-            ...
-        } catch (e) {
-            return this.responseObject(400, {});
-        }
-        try {
-            ...
-        } catch (e) {
-            return this.responseObject(422, {});
-        }
-
-        return this.responseObject(202, {});
-    } else {
-        return this.responseObject(502, "Not Found");
-    }
-}
-```
-
-We could reduce this by removing the need for so many try catch statements however not limit the use cases
-
-```ts
-export const myHandler = httpHandler((event: any) => {
-    if (!this.thing) {
-      throw new NotFoundException('This thing was not found');
-    }
-
-    try {
-        ...
-    } catch (e) {
-      console.error(e);
-      throw new HttpException(e.message);
-    }
-    
-     try {
-        ...
-    } catch (e: ValidationErrors) {
-      throw new BadRequestException(e.errors);
-    }
-    
-    if (this.database.emailExists(event.body.email)) {
-      throw new UnprocessableEntityException(`email [${event.body.email}] is already registered`);
-    }
-});
-```
-
-## Simple implementation 
-
-```ts
-export const mySimpleHandler = httpHanlder(() => {
-    return "Hello! I am a simple return";
-});
-```
-
-## Default status code
-
-```ts
-import {HttpStatusCode, httpHandler} from "@homeservenow/lambda";
-
-export const defaultStatusNoContent = httpHandler(() => {
-    console.log("I don't return so I am a void");
-}, HttpStatusCode.NO_CONTENT);
-```
-
-## Promises
-
-```ts
-export const awaitThisHandler = httpHandler(async (event: APIGatewayEvent): Promise<{success: boolean}> => {
-    const result = await awaitSomeFunction();
-
-    return {sucess: result !== undefined};
-});
-```
-
-## Overriding response handling
-
-Returning an object with either body or statusCode defined will result in httpHandler not manipulating your response.
-
-```ts
-const returnAResponse = httpHandler(() => {
-    return {
-        statusCode: HttpStatusCode.NO_CONTENT,
-        headers: {
-            [`X-Some-header`]: 'header value',
-        },
-    };
-});
-
-const returnAResponseWithoutCodeButWithBody = httpHandler(() => {
-    return {
-        body: JSON.stringify({
-            success: true,
-        }),
-    };
-});
-```
-
-## Typed json event 
-
-Use the `ApiGatewayJsonEvent<T>` for typed json events
-
-```ts
-const jsonExample = httpHandler((event: APIGatewayJsonEvent<JsonExampleDTOInterface>) => {
-    console.log("incoming data", event.json, event.body);
-});
-```
-
-## Validation errors example 
-
-```ts
-const validationErrorsHanlder = httpHandler((event: APIGatewayJsonEvent<{name?: string}>) => {
-    if (!event.json || !event.json.name) {
-        throw new BadRequestException("Validation errors", [
-            {
-                target: event.json,
-                property: "name",
-                value: event.json.name,
-                reason: "Name is required",
+```typescript
+export const myHandler = httpHandler({
+    handler: myHandlerMethod,
+    logging: (error: Error) => console.log(error),
+    errorHandler: (error: Error) => {
+        return {
+            statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
+            body: "Please contact us that this error has occurred (code: 345)",
+        };
+    },
+    serialise: {
+        input: (event: APIGatewayEvent): void => {
+            if (!event.body) {
+                throw new BadRequestException('No body provided');
             }
-        ]);
-    }
+            try {
+                event.json = JSON.parse(event.body);
+            } catch (e) {
+                throw new BadRequestException('Malformed JSON');
+            }
 
-    console.log("valid", event.json.name);
+            return event;
+        },
+        output: (value: any): ApiGatewayResponse => {
+            // TODO figure this function input out types
+        },
+    },
 });
 ```
-
-or even 
-
-```ts
-const validationErrorsHanlder = httpHandler((event: APIGatewayJsonEvent<{name?: string}>) => {
-    const errors = [];
-    if (!event.json || !event.json.name) {
-        errors.push({
-            target: event.json,
-            property: "name",
-            value: event.json.name,
-            reason: "Name is required",
-        });
-    } else if (event.json.name.length >= 255) {
-        errors.push({
-            target: event.json,
-            property: "name",
-            value: event.json.name,
-            reason: "Name is too long, max of 255 characters",
-        });
-    }
-
-    if (errors.length >= 1) throw new BadRequestException("Validation errors", errors);
-
-    console.log("valid", event.json.name);
-});
-```
-
-### Decorators 
-
-For classes we can use the httpHandlerDecorator like so 
-
-```ts
-export class Handlers {
-    @HttpHandlerDecorator()
-    myMethod = () => {
-
-    }
-}
-```
+> Under development!

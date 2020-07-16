@@ -1,5 +1,5 @@
 import { httpHandler } from "./http.handler";
-import {HttpHandlerOptions} from './interfaces';
+import { HttpHandlerOptions } from "./interfaces";
 
 export const HttpHandlerDecorator = <ResponseType>(
   options: HttpHandlerOptions<ResponseType>,

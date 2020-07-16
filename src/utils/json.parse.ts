@@ -8,10 +8,10 @@ export type APIGatewayJsonEvent<
   json: T;
 };
 
-export const JSONParse = <T>(
+export const JSONParse = <RequestType>(
   event: APIGatewayEvent,
-): APIGatewayJsonEvent<T> => {
-  let jsonEvent: APIGatewayJsonEvent<T>;
+): APIGatewayJsonEvent<RequestType> => {
+  let jsonEvent: APIGatewayJsonEvent<RequestType>;
 
   if (
     typeof event.body === "string" &&

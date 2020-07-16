@@ -17,6 +17,11 @@ export interface LoggerInterface {
   error: Function;
 }
 
+export type LoggerFunction = (
+  errorHandlingOptions: ErrorHandlingType,
+  error: Error | HttpErrorException,
+) => void;
+
 class DefaultLogger implements LoggerInterface {
   log = (message: string) =>
     console.log(JSON.stringify({ message, level: "log" }));
@@ -26,7 +31,9 @@ class DefaultLogger implements LoggerInterface {
     console.error(JSON.stringify({ message, level: "error" }));
 }
 
-export const createLoggingHandler = (logger?: LoggerInterface) => {
+export const createLoggingHandler = (
+  logger?: LoggerInterface,
+): LoggerFunction => {
   logger = logger || new DefaultLogger();
 
   return (

@@ -1,8 +1,7 @@
-import { HttpStatusCode } from "./enum";
-import { httpHandler } from "./http.handler";
+import { httpHandler, HttpHandlerOptions } from "./http.handler";
 
-export const HttpHandlerDecorator = (
-  defaultStatus: HttpStatusCode = HttpStatusCode.OK,
+export const HttpHandlerDecorator = <R>(
+  options: HttpHandlerOptions<R>,
 ): MethodDecorator => (
   target: Object,
   key: string | Symbol,
@@ -10,5 +9,8 @@ export const HttpHandlerDecorator = (
 ) => {
   const originalValue = descriptor.value;
 
-  descriptor.value = httpHandler(originalValue, defaultStatus);
+  descriptor.value = httpHandler({
+    ...options,
+    handler: originalValue,
+  });
 };

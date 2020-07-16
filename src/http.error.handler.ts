@@ -3,7 +3,11 @@ import { HttpStatusCode } from "./enum";
 import { APIGatewayProxyResult } from "aws-lambda";
 import { isHttpErrorException } from "./utils";
 
-export const httpErrorHandler = (
+export type ErrorHandlerFunction = (
+  error: HttpErrorResponseInterface | Error,
+) => APIGatewayProxyResult;
+
+export const httpErrorHandler: ErrorHandlerFunction = (
   error: HttpErrorResponseInterface | Error,
 ): APIGatewayProxyResult => ({
   statusCode: isHttpErrorException(error)

@@ -6,3 +6,4 @@ export * from "./http.response.handler";
 export * from "./http.handler";
 export * from "./exceptions";
 export { ErrorHandlingType, LoggerInterface } from "./logging.handler";
+export { APIGatewayJsonEvent } from "./utils";

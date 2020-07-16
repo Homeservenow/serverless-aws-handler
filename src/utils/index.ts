@@ -15,3 +15,5 @@ export const isResponseType = (obj: any): obj is APIGatewayProxyResult =>
 
 export const isHttpErrorException = (obj: any): obj is HttpErrorException =>
   obj instanceof HttpErrorException;
+
+export * from "./json.parse";

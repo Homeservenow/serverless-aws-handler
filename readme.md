@@ -24,7 +24,7 @@ import {httpHandler, NotFoundException} from '@homeservenow/serverless-aws-handl
 import {APIGatewayEvent} from 'aws-lambda';
 import {database} from './database';
 
-export const getCatHandler = httpHandler(async (event: APIGatewayEvent): Promise<CatInterface | never> => {
+export const getCatHandler = httpHandler(async (event: APIGatewayEvent): Promise<CatInterface> => {
     const cat = await database().findById(event?.pathParameters.id);
 
     if (!cat) {
@@ -54,7 +54,7 @@ Or if `NotFoundException` is thrown, a 404 status code (because of NotFoundExcep
 
 #### Post method example
 
-You'll notive in this example, we're returning validation errors!
+You'll notice in this example, we're returning validation errors!
 
 ```typescript
 import {httpHandler, NotFoundException, BadRequestException} from '@homeservenow/serverless-aws-handler';
@@ -69,7 +69,7 @@ export const createCatHandler = httpHandler<Partial<CatInterface>>(async (
 
     const validationErrors = {};
 
-    (["breed", "name", "lives"] as keyof CatInterface).forEach((property) => {
+    (["breed", "name", "lives"] as (keyof CatInterface)[]).forEach((property) => {
         if (!payload[property]) {
             validationErrors[property] = 'Cannot be blank!';
         }
@@ -95,9 +95,8 @@ If validation errors occur then the handler will return a 400 status code plus t
 
 ## Available HTTP exceptions
 
-========
 Exception name | status code | default message
-========
+---|---|---
 `BadRequestException` | 400 | Bad Request
 `UnauthorizedException` | 401 | Unauthorized
 `ForbiddenException` | 403 | Forbidden

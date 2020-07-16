@@ -104,45 +104,133 @@ Exception name | status code | default message
 `UnProcessableEntityException` | 422 | 'Unprocessable Entity
 `InternalServerError` | 500 | Internal Server Error
 
-## Future goals! 
-
-> This is currently in development! 
-
-Customable overrides of all methods provided by httpHandler. This includes 
-
-- Error Handling
-- Payload in/out serialisation
-- Logging
-
-This is the proposed structure
+## Validator
 
 ```typescript
 export const myHandler = httpHandler({
     handler: myHandlerMethod,
-    logging: (error: Error) => console.log(error),
-    errorHandler: (error: Error) => {
-        return {
-            statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
-            body: "Please contact us that this error has occurred (code: 345)",
-        };
-    },
-    serialise: {
-        input: (event: APIGatewayEvent): void => {
-            if (!event.body) {
-                throw new BadRequestException('No body provided');
-            }
-            try {
-                event.json = JSON.parse(event.body);
-            } catch (e) {
-                throw new BadRequestException('Malformed JSON');
-            }
+});
+```
 
-            return event;
-        },
-        output: (value: any): ApiGatewayResponse => {
-            // TODO figure this function input out types
-        },
+## Serialisation
+
+#### Input
+
+#### Output
+
+## Custom Error Handling
+
+## Default status code and headers
+
+The below example will always output a status code of 204.
+
+```typescript
+export const myHandler = httpHandler({
+    handler: (event: APIGatwayProxyEvent) => {
+
+    },
+    defaultStatusCode: HttpStatusCode.NO_CONTENT,
+});
+```
+#### default Headers 
+
+The below example will always a header `X-header`
+
+```typescript
+export const myHandler = httpHandler({
+    handler: (event: APIGatwayProxyEvent) => {
+
+    },
+    defaultHeaders: {
+        ['X-header']: 'Hello!',
     },
 });
 ```
-> Under development!
+
+## Exception logging options 
+
+The httpHandler has it's own logging method which you can customise. This method will make info logs, warn logs and error logs using console.
+
+There are several different logging methods 
+
+- By http status
+- Range by http status
+- Blacklist | whitelist
+- boolean
+
+Logging is only called when an exception occurs. All of the below examples are for generally for status codes of 400 and above. However it is possible to override.
+
+#### Singular http status
+
+Will only log `INTERNAL_SERVER_ERROR` (500) status codes.
+
+```typescript
+export const myHandler = httpHandler({
+    handler: myHandlerMethod,
+    loggingHandlingOpions: HttpStatusCode.INTERNAL_SERVER_ERROR,
+});
+```
+
+#### Range by http status
+
+A range will only log errors within the targed range including the given values. In this example all exceptions with a status code between `400` and `403` will be logged. `500` Status codes will not be logged in this example.
+
+```typescript
+export const myHandler = httpHandler({
+    handler: myHandlerMethod,
+    loggingHandlingOpions: [HttpStatusCode.BAD_REQUEST, HttpStatusCode.FORBIDDEN],
+});
+```
+
+##### Blacklist
+
+If you was to use the blacklist without the whitelist, any status code not in the array will be logged. Anything other than 400 and 401 will be logged here.
+
+```typescript
+export const myHandler = httpHandler({
+    handler: myHandlerMethod,
+    loggingHandlingOpions: {
+        blacklist: [
+            HttpStatusCode.BAD_REQUEST,
+            HttpStatusCode.UNAUTHORIZED,
+        ],
+    },
+});
+```
+
+##### Whitelist
+
+In this example, only 400 status code exceptions will be logged.
+
+```typescript
+export const myHandler = httpHandler({
+    handler: myHandlerMethod,
+    loggingHandlingOpions: {
+        whitelist: [
+            HttpStatusCode.BAD_REQUEST,
+        ],
+    },
+});
+```
+
+#### Blacklist | Whitelist
+
+In this example, any status code within a whitelist will be logged. Anything in the blacklist will not be logged. However. If the given status code is in both provided arrays, then the blacklist overrides the whitelist and the error will not be logged.
+
+In the given example, only forbidden status codes will be logged. Any other status code will not.
+
+```typescript
+export const myHandler = httpHandler({
+    handler: myHandlerMethod,
+    loggingHandlingOpions: {
+        blacklist: [
+            HttpStatusCode.BAD_REQUEST,
+            HttpStatusCode.UNAUTHORIZED,
+        ],
+        whitelist: [
+            HttpStatusCode.BAD_REQUEST,
+            HttpStatusCode.FORBIDDEN,
+        ],
+    },
+});
+```

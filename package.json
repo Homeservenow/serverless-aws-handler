@@ -33,7 +33,6 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "coveralls": "yarn run test:cov --coverageReporters=text-lcov | coveralls",
     "build": "tsc -p ."
   },
   "jest": {

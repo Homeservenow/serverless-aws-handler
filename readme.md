@@ -17,7 +17,7 @@ $ yarn add @homeservenow/serverless-aws-handler
  - Payload serialisation
  - Strong types :muscle:
  
- ## Usage
+## Usage
 
  ```typescript
 import { httpHandler, NotFoundException } from '@homeservenow/serverless-aws-handler';

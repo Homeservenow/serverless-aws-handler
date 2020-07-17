@@ -10,7 +10,6 @@ import {
   Context,
   APIGatewayProxyResult,
   APIGatewayProxyHandler,
-  Callback,
 } from "aws-lambda";
 import { createLoggingHandler } from "./logging.handler";
 import { JSONParse } from "./utils/json.parse";
@@ -59,7 +58,6 @@ export const httpHandler = <RequestType extends any, ResponseType extends any>(
 ): APIGatewayProxyHandler => (
   event: APIGatewayEvent,
   context: Context,
-  callback: Callback<APIGatewayProxyResult>,
 ): Promise<APIGatewayProxyResult> => {
   const options = createOptions(handlerOptionsOrFunction);
 

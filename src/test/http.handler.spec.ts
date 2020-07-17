@@ -6,7 +6,7 @@ import {
   BadRequestException,
   UnauthorizedException,
   ForbiddenException,
-} from "../src";
+} from "..";
 import { createMockAPIGatewayEvent } from "./events";
 import * as mockContext from "aws-lambda-mock-context";
 

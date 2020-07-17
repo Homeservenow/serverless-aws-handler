@@ -12,5 +12,5 @@
       "incremental": true,
       "strict": true
     },
-    "exclude": ["node_modules", "dist", "test", "./index.ts", "./test"]
+    "exclude": ["node_modules", "dist", "src/test", "./index.ts"]
 }

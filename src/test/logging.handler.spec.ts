@@ -2,12 +2,12 @@ import {
   createLoggingHandler,
   LoggerInterface,
   LoggerFunction,
-} from "./../src/logging.handler";
+} from "../logging.handler";
 import {
   HttpStatusCode,
   UnauthorizedException,
   BadRequestException,
-} from "../src";
+} from "..";
 
 class TestLogging implements LoggerInterface {
   public result?: string;

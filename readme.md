@@ -317,7 +317,7 @@ Will only log `INTERNAL_SERVER_ERROR` (500) status codes.
 ```typescript
 export const myHandler = httpHandler({
     handler: myHandlerMethod,
-    loggingHandlingOpions: HttpStatusCode.INTERNAL_SERVER_ERROR,
+    loggingOptions: HttpStatusCode.INTERNAL_SERVER_ERROR,
 });
 ```
 
@@ -328,7 +328,7 @@ A range will only log errors within the target range including the given values.
 ```typescript
 export const myHandler = httpHandler({
     handler: myHandlerMethod,
-    loggingHandlingOpions: [HttpStatusCode.BAD_REQUEST, HttpStatusCode.FORBIDDEN],
+    loggingOptions: [HttpStatusCode.BAD_REQUEST, HttpStatusCode.FORBIDDEN],
 });
 ```
 
@@ -339,7 +339,7 @@ If you was to use the blacklist without the whitelist, any status code not in th
 ```typescript
 export const myHandler = httpHandler({
     handler: myHandlerMethod,
-    loggingHandlingOpions: {
+    loggingOptions: {
         blacklist: [
             HttpStatusCode.BAD_REQUEST,
             HttpStatusCode.UNAUTHORIZED,
@@ -355,7 +355,7 @@ In this example, only 400 status code exceptions will be logged.
 ```typescript
 export const myHandler = httpHandler({
     handler: myHandlerMethod,
-    loggingHandlingOpions: {
+    loggingOptions: {
         whitelist: [
             HttpStatusCode.BAD_REQUEST,
         ],
@@ -372,7 +372,7 @@ In the given example, only forbidden status codes will be logged. Any other stat
 ```typescript
 export const myHandler = httpHandler({
     handler: myHandlerMethod,
-    loggingHandlingOpions: {
+    loggingOptions: {
         blacklist: [
             HttpStatusCode.BAD_REQUEST,
             HttpStatusCode.UNAUTHORIZED,

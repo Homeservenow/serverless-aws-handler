@@ -9,6 +9,10 @@
     "wrapper"
   ],
   "author": "Ashleigh Simonelli <aaryanna.homeserve@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Homeservenow/serverless-aws-handler"
+  },
   "devDependencies": {
     "@serverless/event-mocks": "^1.1.1",
     "@types/aws-lambda": "^8.10.55",

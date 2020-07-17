@@ -36,7 +36,7 @@ export type HttpHandlerOptions<RequestType, ResponseType> = {
     input?: (value: APIGatewayEvent) => any;
     output?: ResponseSerialiserFunction<ResponseType>;
   };
-  loggingHandlingOptions?: ErrorHandlingOptionsType;
+  loggingOptions?: ErrorHandlingOptionsType;
 };
 
 export type HttpHandlerFunctionOrOptions<RequestType, ResponseType> =
@@ -55,7 +55,7 @@ export type HttpHandlerFunctionBuiltOptions<RequestType, ResponseType> = {
     input?: (value: APIGatewayEvent) => any;
     output?: ResponseSerialiserFunction<ResponseType>;
   };
-  loggingHandlingOptions: ErrorHandlingOptionsType;
+  loggingOptions: ErrorHandlingOptionsType;
   handler: HttpHandlerFunction<RequestType, ResponseType>;
 };
 
@@ -68,5 +68,5 @@ export type HttpHandlerDefaultOptions<RequestType, ResponseType> = {
     input: (value: APIGatewayEvent) => any;
     output: ResponseSerialiserFunction<ResponseType>;
   };
-  loggingHandlingOptions: ErrorHandlingOptionsType;
+  loggingOptions: ErrorHandlingOptionsType;
 };

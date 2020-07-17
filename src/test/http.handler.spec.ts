@@ -6,6 +6,7 @@ import {
   BadRequestException,
   UnauthorizedException,
   ForbiddenException,
+  InternalServerError,
 } from "..";
 import { createMockAPIGatewayEvent } from "./events";
 import * as mockContext from "aws-lambda-mock-context";
@@ -121,6 +122,42 @@ describe("HttpHandler", () => {
       );
 
       expect(result && result.statusCode).toBe(HttpStatusCode.UNAUTHORIZED);
+    });
+
+    it("InternalServerException", async () => {
+      const testHttpMethod = httpHandler(async () => {
+        throw new Error();
+
+        return {
+          test: true,
+        };
+      });
+
+      const result = await testHttpMethod(
+        createMockAPIGatewayEvent({}),
+        context,
+        () => {},
+      );
+
+      expect(result && result.statusCode).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
+    });
+
+    it("InternalServerException", async () => {
+      const testHttpMethod = httpHandler(async () => {
+        throw new InternalServerError();
+
+        return {
+          test: true,
+        };
+      });
+
+      const result = await testHttpMethod(
+        createMockAPIGatewayEvent({}),
+        context,
+        () => {},
+      );
+
+      expect(result && result.statusCode).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
     });
 
     it("ForbiddenException", async () => {

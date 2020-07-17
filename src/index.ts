@@ -5,4 +5,5 @@ export * from "./http.error.handler";
 export * from "./http.response.handler";
 export * from "./http.handler";
 export * from "./exceptions";
-export { ErrorHandlingType, LoggerInterface } from "./logging.handler";
+export { ErrorHandlingOptionsType, LoggerInterface } from "./logging.handler";
+export { isHttpErrorException } from "./utils";

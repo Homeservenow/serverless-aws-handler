@@ -1,12 +1,13 @@
 import {
   createLoggingHandler,
   LoggerInterface,
-} from "./../src/logging.handler";
+  LoggerFunction,
+} from "../logging.handler";
 import {
   HttpStatusCode,
   UnauthorizedException,
   BadRequestException,
-} from "../src";
+} from "..";
 
 class TestLogging implements LoggerInterface {
   public result?: string;
@@ -17,7 +18,7 @@ class TestLogging implements LoggerInterface {
 
 describe("Logging Handling", () => {
   describe("With conosle", () => {
-    let handler;
+    let handler: LoggerFunction;
     beforeEach(() => {
       global.console = {
         ...global.console,
@@ -86,7 +87,7 @@ describe("Logging Handling", () => {
       it("Is Not Inside Blacklist", () => {
         handler(
           {
-            blackList: [
+            blacklist: [
               HttpStatusCode.BAD_REQUEST,
               HttpStatusCode.UNPROCESSABLE_ENTITY,
             ],

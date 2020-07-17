@@ -6,8 +6,7 @@ import {
   BadRequestException,
   UnauthorizedException,
   ForbiddenException,
-  APIGatewayJsonEvent,
-} from "../src";
+} from "..";
 import { createMockAPIGatewayEvent } from "./events";
 import * as mockContext from "aws-lambda-mock-context";
 
@@ -21,21 +20,32 @@ describe("HttpHandler", () => {
   const context = mockContext();
 
   it("Will return 200", async () => {
-    const result = await testHttpMethod(createMockAPIGatewayEvent({}), context);
+    const result = await testHttpMethod(
+      createMockAPIGatewayEvent({}),
+      context,
+      () => {},
+    );
 
-    expect(result.statusCode).toBe(HttpStatusCode.OK);
+    expect(result && result.statusCode).toBe(HttpStatusCode.OK);
   });
 
   it("Can have different default return value", async () => {
-    const testHttpMethod = httpHandler(async () => {
-      return {
-        test: true,
-      };
-    }, HttpStatusCode.NO_CONTENT);
+    const testHttpMethod = httpHandler({
+      handler: async () => {
+        return {
+          test: true,
+        };
+      },
+      defaultStatusCode: HttpStatusCode.NO_CONTENT,
+    });
 
-    const result = await testHttpMethod(createMockAPIGatewayEvent({}), context);
+    const result = await testHttpMethod(
+      createMockAPIGatewayEvent({}),
+      context,
+      () => {},
+    );
 
-    expect(result.statusCode).toBe(HttpStatusCode.NO_CONTENT);
+    expect(result && result.statusCode).toBe(HttpStatusCode.NO_CONTENT);
   });
 
   describe("Can return http exceptions using exceptions", () => {
@@ -51,9 +61,10 @@ describe("HttpHandler", () => {
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
+        () => {},
       );
 
-      expect(result.statusCode).toBe(HttpStatusCode.NOT_FOUND);
+      expect(result && result.statusCode).toBe(HttpStatusCode.NOT_FOUND);
     });
 
     it("UnprocessableEntityException", async () => {
@@ -68,9 +79,12 @@ describe("HttpHandler", () => {
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
+        () => {},
       );
 
-      expect(result.statusCode).toBe(HttpStatusCode.UNPROCESSABLE_ENTITY);
+      expect(result && result.statusCode).toBe(
+        HttpStatusCode.UNPROCESSABLE_ENTITY,
+      );
     });
 
     it("BadRequestException", async () => {
@@ -85,9 +99,10 @@ describe("HttpHandler", () => {
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
+        () => {},
       );
 
-      expect(result.statusCode).toBe(HttpStatusCode.BAD_REQUEST);
+      expect(result && result.statusCode).toBe(HttpStatusCode.BAD_REQUEST);
     });
 
     it("UnauthorizedException", async () => {
@@ -102,9 +117,10 @@ describe("HttpHandler", () => {
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
+        () => {},
       );
 
-      expect(result.statusCode).toBe(HttpStatusCode.UNAUTHORIZED);
+      expect(result && result.statusCode).toBe(HttpStatusCode.UNAUTHORIZED);
     });
 
     it("ForbiddenException", async () => {
@@ -119,9 +135,10 @@ describe("HttpHandler", () => {
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
+        () => {},
       );
 
-      expect(result.statusCode).toBe(HttpStatusCode.FORBIDDEN);
+      expect(result && result.statusCode).toBe(HttpStatusCode.FORBIDDEN);
     });
   });
 
@@ -134,7 +151,7 @@ describe("HttpHandler", () => {
       });
 
       expect(
-        await testHttpMethod(createMockAPIGatewayEvent({}), context),
+        await testHttpMethod(createMockAPIGatewayEvent({}), context, () => {}),
       ).toStrictEqual({ statusCode: HttpStatusCode.UNPROCESSABLE_ENTITY });
     });
 
@@ -146,7 +163,7 @@ describe("HttpHandler", () => {
       });
 
       expect(
-        await testHttpMethod(createMockAPIGatewayEvent({}), context),
+        await testHttpMethod(createMockAPIGatewayEvent({}), context, () => {}),
       ).toStrictEqual({ body: "test", statusCode: 200 });
     });
 
@@ -164,7 +181,7 @@ describe("HttpHandler", () => {
       });
 
       expect(
-        await testHttpMethod(createMockAPIGatewayEvent({}), context),
+        await testHttpMethod(createMockAPIGatewayEvent({}), context, () => {}),
       ).toStrictEqual({
         body: '{"someString":"hello"}',
         statusCode: 201,
@@ -176,19 +193,19 @@ describe("HttpHandler", () => {
   describe("Can return additional exception data", () => {
     it("Can return validation errors", async () => {
       const validationErrorsHanlder = httpHandler<{ name?: string }, void>(
-        async (event: APIGatewayJsonEvent<{ name?: string }>) => {
-          if (!event.body || !event.json.name) {
+        async ({ event, payload }) => {
+          if (!event.body || !payload.name) {
             throw new BadRequestException("Validation errors", [
               {
-                target: event.json,
+                target: payload,
                 property: "name",
-                value: event.json.name,
+                value: payload.name,
                 reason: "Name is required",
               },
             ]);
           }
 
-          console.log("valid", event.json.name);
+          console.log("valid", payload.name);
         },
       );
 
@@ -198,6 +215,7 @@ describe("HttpHandler", () => {
             body: "{}",
           }),
           context,
+          () => {},
         ),
       ).toStrictEqual({
         statusCode: HttpStatusCode.BAD_REQUEST,

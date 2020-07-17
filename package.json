@@ -8,7 +8,7 @@
     "handler",
     "wrapper"
   ],
-  "author": "Ashleigh Simonelli <ashleigh.homeserve@gmail.com>",
+  "author": "Ashleigh Simonelli <aaryanna.homeserve@gmail.com>",
   "devDependencies": {
     "@serverless/event-mocks": "^1.1.1",
     "@types/aws-lambda": "^8.10.55",
@@ -37,13 +37,13 @@
       "json",
       "ts"
     ],
-    "rootDir": "test",
+    "rootDir": "src",
     "testRegex": ".spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "collectCoverage": true
   },
   "dependencies": {},
   "license": "MIT"

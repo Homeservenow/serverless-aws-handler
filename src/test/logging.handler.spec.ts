@@ -3,7 +3,7 @@ import {
   LoggerInterface,
   LoggerFunction,
 } from "../logging.handler";
-import { HttpStatusCode, UnauthorizedException, BadRequestException } from "..";
+import { HttpStatusCode, UnauthorizedException, BadRequestException, NotFoundException } from "..";
 
 class TestLogging implements LoggerInterface {
   public result?: string;
@@ -116,6 +116,17 @@ describe("Logging Handling", () => {
           },
           new BadRequestException(),
         );
+        expect(global.console.log).not.toHaveBeenCalled();
+      });
+    });
+    describe("number", () => {
+      it("Is the same", () => {
+        handler(HttpStatusCode.NOT_FOUND, new NotFoundException());
+        expect(global.console.log).toHaveBeenCalled();
+      });
+
+      it("Not the same", () => {
+        handler(HttpStatusCode.INTERNAL_SERVER_ERROR, new NotFoundException());
         expect(global.console.log).not.toHaveBeenCalled();
       });
     });

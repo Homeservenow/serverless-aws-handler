@@ -8,8 +8,8 @@ import { HttpStatusCode } from "./enum";
 import {
   APIGatewayEvent,
   Context,
+  APIGatewayProxyEvent,
   APIGatewayProxyResult,
-  APIGatewayProxyHandler,
 } from "aws-lambda";
 import { createLoggingHandler } from "./logging.handler";
 import { JSONParse } from "./utils/json.parse";
@@ -49,6 +49,7 @@ const createOptions = <RequestType, ResponseType>(
         ...handlerOptionsOrFunction,
       };
 };
+export type PromisifiedAPIGatewayProxyHandler = (event: APIGatewayProxyEvent, context: Context) => Promise<APIGatewayProxyResult>
 
 /**
  * A universal wrapper function response hander for aws handlers
@@ -58,7 +59,7 @@ export const httpHandler = <RequestType extends any, ResponseType extends any>(
     RequestType,
     ResponseType
   >,
-): APIGatewayProxyHandler => (
+): PromisifiedAPIGatewayProxyHandler => (
   event: APIGatewayEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> => {

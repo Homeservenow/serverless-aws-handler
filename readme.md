@@ -21,7 +21,6 @@ $ yarn add @homeservenow/serverless-aws-handler
 
  ```typescript
 import { httpHandler, NotFoundException } from '@homeservenow/serverless-aws-handler';
-import { APIGatewayEvent } from 'aws-lambda';
 import { database } from './database';
 
 export const getCatHandler = httpHandler(async ({event}): Promise<CatInterface> => {
@@ -98,17 +97,14 @@ If validation errors occur then the handler will return a 400 status code plus t
 import { httpHandler, NotFoundException } from '@homeservenow/serverless-aws-handler';
 import {database} from './database';
 
-export const getCatHandler = httpHandler<CatInterface>({
-    handler: async ({event}): Promise<CatInterface | never> => {
+export const getCatHandler = httpHandler<CatInterface>(async ({event}): Promise<CatInterface | never> => {
+    const cat = await database().find(event?.pathParameters.id);
 
-        const cat = await database().find(event?.pathParameters.id);
+    if (!cat) {
+        throw new NotFoundException();
+    }
 
-        if (!cat) {
-            throw new NotFoundException();
-        }
-
-        return cat;
-    },
+    return cat;
 });
 ```
 

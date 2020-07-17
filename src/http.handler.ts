@@ -27,7 +27,7 @@ const createOptions = <RequestType, ResponseType>(
     errorHandler: httpErrorHandler,
     logger: createLoggingHandler(),
     defaultStatusCode: HttpStatusCode.OK,
-    loggingHandlingOpions: [
+    loggingHandlingOptions: [
       HttpStatusCode.BAD_REQUEST,
       HttpStatusCode.NETWORK_READ_TIMEOUT,
     ],
@@ -93,12 +93,12 @@ export const httpHandler = <RequestType extends any, ResponseType extends any>(
           result,
           options.defaultStatusCode,
           options?.serialise?.output || httpResponsePayloadHandler,
-          options.defaultHeaders,
+          options.defaultOutputHeaders,
         ),
       );
     } catch (error) {
       options.logger(
-        options.loggingHandlingOpions || [
+        options.loggingHandlingOptions || [
           HttpStatusCode.BAD_REQUEST,
           HttpStatusCode.NETWORK_READ_TIMEOUT,
         ],

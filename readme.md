@@ -134,7 +134,7 @@ export const myHandler = httpHandler({
 ```
 #### default Headers 
 
-The below example will always a header `X-header`
+The below example will always output a header `X-header`
 
 ```typescript
 export const myHandler = httpHandler({
@@ -149,7 +149,7 @@ export const myHandler = httpHandler({
 
 ## Exception logging options 
 
-The httpHandler has it's own logging method which you can customise. This method will make info logs, warn logs and error logs using console.
+The httpHandler has its own default logging method which you can customise. This method will make info logs, warn logs and error logs using console.
 
 There are several different logging methods 
 
@@ -158,7 +158,7 @@ There are several different logging methods
 - Blacklist | whitelist
 - boolean
 
-Logging is only called when an exception occurs. All of the below examples are for generally for status codes of 400 and above. However it is possible to override.
+Logging is only called when an exception occurs. All of the below examples are generally for status codes of 400 and above. However it is possible to override.
 
 #### Singular http status
 
@@ -173,7 +173,7 @@ export const myHandler = httpHandler({
 
 #### Range by http status
 
-A range will only log errors within the targed range including the given values. In this example all exceptions with a status code between `400` and `403` will be logged. `500` Status codes will not be logged in this example.
+A range will only log errors within the target range including the given values. In this example all exceptions with a status code between `400` and `403` will be logged. `500` Status codes will not be logged in this example.
 
 ```typescript
 export const myHandler = httpHandler({

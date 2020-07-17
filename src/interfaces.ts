@@ -28,14 +28,14 @@ export type HttpHandlerFunction<RequestType, ResponseType> = (input: {
 export type HttpHandlerOptions<RequestType, ResponseType> = {
   errorHandler?: ErrorHandlerFunction;
   defaultStatusCode?: HttpStatusCode;
-  defaultHeaders?: { [s: string]: string };
+  defaultOutputHeaders?: { [s: string]: string };
   logger?: LoggerFunction;
   validator?: ValidatorFunction<RequestType>;
   serialise?: {
     input?: (value: APIGatewayEvent) => any;
     output?: ResponseSerialiserFunction<ResponseType>;
   };
-  loggingHandlingOpions?: ErrorHandlingOptionsType;
+  loggingHandlingOptions?: ErrorHandlingOptionsType;
 };
 
 export type HttpHandlerFunctionOptions<RequestType, ResponseType> =
@@ -47,14 +47,14 @@ export type HttpHandlerFunctionOptions<RequestType, ResponseType> =
 export type HttpHandlerFunctionBuiltOptions<RequestType, ResponseType> = {
   errorHandler: ErrorHandlerFunction;
   defaultStatusCode: HttpStatusCode;
-  defaultHeaders?: { [s: string]: string };
+  defaultOutputHeaders?: { [s: string]: string };
   logger: LoggerFunction;
   validator?: ValidatorFunction<RequestType>;
   serialise: {
     input?: (value: APIGatewayEvent) => any;
     output?: ResponseSerialiserFunction<ResponseType>;
   };
-  loggingHandlingOpions: ErrorHandlingOptionsType;
+  loggingHandlingOptions: ErrorHandlingOptionsType;
   handler: HttpHandlerFunction<RequestType, ResponseType>;
 };
 
@@ -67,5 +67,5 @@ export type HttpHandlerDefaultOptions<RequestType, ResponseType> = {
     input: (value: APIGatewayEvent) => any;
     output: ResponseSerialiserFunction<ResponseType>;
   };
-  loggingHandlingOpions: ErrorHandlingOptionsType;
+  loggingHandlingOptions: ErrorHandlingOptionsType;
 };

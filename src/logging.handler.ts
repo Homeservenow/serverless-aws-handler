@@ -2,7 +2,7 @@ import { HttpStatusCode } from "./enum";
 import { HttpErrorException } from "./exceptions";
 import { isHttpErrorException } from "./utils";
 
-export type ErrorHandlingType =
+export type ErrorHandlingOptionsType =
   | HttpStatusCode
   | [HttpStatusCode, HttpStatusCode]
   | {
@@ -18,7 +18,7 @@ export interface LoggerInterface {
 }
 
 export type LoggerFunction = (
-  errorHandlingOptions: ErrorHandlingType,
+  errorHandlingOptions: ErrorHandlingOptionsType,
   error: Error | HttpErrorException,
 ) => void;
 
@@ -32,12 +32,12 @@ class DefaultLogger implements LoggerInterface {
 }
 
 export const createLoggingHandler = (
-  logger?: LoggerInterface,
+  customLoger?: LoggerInterface,
 ): LoggerFunction => {
-  logger = logger || new DefaultLogger();
+  const logger = customLoger ? customLoger : new DefaultLogger();
 
   return (
-    errorHandlingOptions: ErrorHandlingType,
+    errorHandlingOptions: ErrorHandlingOptionsType,
     error: Error | HttpErrorException,
   ): void => {
     let log: boolean = false;

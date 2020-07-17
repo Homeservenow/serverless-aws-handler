@@ -6,7 +6,6 @@ import {
   BadRequestException,
   UnauthorizedException,
   ForbiddenException,
-  APIGatewayJsonEvent,
 } from "../src";
 import { createMockAPIGatewayEvent } from "./events";
 import * as mockContext from "aws-lambda-mock-context";
@@ -194,19 +193,19 @@ describe("HttpHandler", () => {
   describe("Can return additional exception data", () => {
     it("Can return validation errors", async () => {
       const validationErrorsHanlder = httpHandler<{ name?: string }, void>(
-        async (event: APIGatewayJsonEvent<{ name?: string }>) => {
-          if (!event.body || !event.json.name) {
+        async ({ event, payload }) => {
+          if (!event.body || !payload.name) {
             throw new BadRequestException("Validation errors", [
               {
-                target: event.json,
+                target: payload,
                 property: "name",
-                value: event.json.name,
+                value: payload.name,
                 reason: "Name is required",
               },
             ]);
           }
 
-          console.log("valid", event.json.name);
+          console.log("valid", payload.name);
         },
       );
 

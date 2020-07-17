@@ -14,47 +14,76 @@ import {
 } from "aws-lambda";
 import { createLoggingHandler } from "./logging.handler";
 import { JSONParse } from "./utils/json.parse";
-import { HttpHandlerFunctionOptions } from "./interfaces";
+import {
+  HttpHandlerFunctionOptions,
+  HttpHandlerDefaultOptions,
+  HttpHandlerFunctionBuiltOptions,
+} from "./interfaces";
+
+const createOptions = <RequestType, ResponseType>(
+  options: HttpHandlerFunctionOptions<RequestType, ResponseType>,
+): HttpHandlerFunctionBuiltOptions<RequestType, ResponseType> => {
+  const defaultOptions: HttpHandlerDefaultOptions<RequestType, ResponseType> = {
+    errorHandler: httpErrorHandler,
+    logger: createLoggingHandler(),
+    defaultStatusCode: HttpStatusCode.OK,
+    loggingHandlingOpions: [
+      HttpStatusCode.BAD_REQUEST,
+      HttpStatusCode.NETWORK_READ_TIMEOUT,
+    ],
+    serialise: {
+      input: JSONParse,
+      output: httpResponsePayloadHandler,
+    },
+  };
+
+  return typeof options === "function"
+    ? {
+        ...defaultOptions,
+        handler: options,
+      }
+    : {
+        ...defaultOptions,
+        ...options,
+      };
+};
 
 /**
  * A universal wrapper function response hander for aws handlers
  */
 export const httpHandler = <RequestType extends any, ResponseType extends any>(
-  handlerOptions: HttpHandlerFunctionOptions<RequestType, ResponseType>,
+  handlerOptionsOrFunction: HttpHandlerFunctionOptions<
+    RequestType,
+    ResponseType
+  >,
 ): APIGatewayProxyHandler => (
   event: APIGatewayEvent,
   context: Context,
   callback: Callback<APIGatewayProxyResult>,
 ): Promise<APIGatewayProxyResult> => {
-  const options: HttpHandlerFunctionOptions<RequestType, ResponseType> =
-    typeof handlerOptions === "function"
-      ? {
-          handler: handlerOptions,
-        }
-      : handlerOptions;
+  const options = createOptions(handlerOptionsOrFunction);
 
-  const loggingHandler = options.logger || createLoggingHandler();
-  
   return new Promise(async (resolve) => {
     try {
-      const serialisedEvent =
-        options?.serialise?.input(event) || JSONParse(event);
+      const deserialisedPayload = options.serialise.input
+        ? options.serialise.input(event)
+        : JSONParse(event);
 
-      if (options.validator && serialisedEvent) {
-        options.validator(serialisedEvent);
-      }
+      const payload = options.validator
+        ? options.validator(deserialisedPayload)
+        : deserialisedPayload;
 
-      const result = await options.handler(serialisedEvent || event, context);
+      const result = await options.handler({ payload, event, context });
 
       if (isResponseType(result)) {
         if (!result.hasOwnProperty("statusCode")) {
-          result.statusCode = options.defaultStatusCode || HttpStatusCode.OK;
+          result.statusCode = options.defaultStatusCode;
         }
 
         if (result.body)
-          result.body =
-            options?.serialise?.output(result) ||
-            httpResponsePayloadHandler(result.body);
+          result.body = options.serialise.output
+            ? options.serialise.output(result.body)
+            : httpResponsePayloadHandler(result.body);
 
         resolve(result);
       }
@@ -62,13 +91,13 @@ export const httpHandler = <RequestType extends any, ResponseType extends any>(
       resolve(
         httpResponseHandler(
           result,
-          options.defaultStatusCode || HttpStatusCode.OK,
+          options.defaultStatusCode,
           options?.serialise?.output || httpResponsePayloadHandler,
           options.defaultHeaders,
         ),
       );
     } catch (error) {
-      loggingHandler(
+      options.logger(
         options.loggingHandlingOpions || [
           HttpStatusCode.BAD_REQUEST,
           HttpStatusCode.NETWORK_READ_TIMEOUT,

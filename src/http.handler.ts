@@ -15,13 +15,13 @@ import {
 import { createLoggingHandler } from "./logging.handler";
 import { JSONParse } from "./utils/json.parse";
 import {
-  HttpHandlerFunctionOptions,
+  HttpHandlerFunctionOrOptions,
   HttpHandlerDefaultOptions,
   HttpHandlerFunctionBuiltOptions,
 } from "./interfaces";
 
 const createOptions = <RequestType, ResponseType>(
-  options: HttpHandlerFunctionOptions<RequestType, ResponseType>,
+  options: HttpHandlerFunctionOrOptions<RequestType, ResponseType>,
 ): HttpHandlerFunctionBuiltOptions<RequestType, ResponseType> => {
   const defaultOptions: HttpHandlerDefaultOptions<RequestType, ResponseType> = {
     errorHandler: httpErrorHandler,
@@ -52,7 +52,7 @@ const createOptions = <RequestType, ResponseType>(
  * A universal wrapper function response hander for aws handlers
  */
 export const httpHandler = <RequestType extends any, ResponseType extends any>(
-  handlerOptionsOrFunction: HttpHandlerFunctionOptions<
+  handlerOptionsOrFunction: HttpHandlerFunctionOrOptions<
     RequestType,
     ResponseType
   >,

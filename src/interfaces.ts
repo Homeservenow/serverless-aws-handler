@@ -39,7 +39,7 @@ export type HttpHandlerOptions<RequestType, ResponseType> = {
   loggingHandlingOptions?: ErrorHandlingOptionsType;
 };
 
-export type HttpHandlerFunctionOptions<RequestType, ResponseType> =
+export type HttpHandlerFunctionOrOptions<RequestType, ResponseType> =
   | ({
       handler: HttpHandlerFunction<RequestType, ResponseType>;
     } & HttpHandlerOptions<RequestType, ResponseType>)

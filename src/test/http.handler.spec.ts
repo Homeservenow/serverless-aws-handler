@@ -139,7 +139,9 @@ describe("HttpHandler", () => {
         () => {},
       );
 
-      expect(result && result.statusCode).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
+      expect(result && result.statusCode).toBe(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+      );
     });
 
     it("InternalServerException", async () => {
@@ -157,7 +159,9 @@ describe("HttpHandler", () => {
         () => {},
       );
 
-      expect(result && result.statusCode).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
+      expect(result && result.statusCode).toBe(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+      );
     });
 
     it("ForbiddenException", async () => {

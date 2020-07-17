@@ -3,7 +3,12 @@ import {
   LoggerInterface,
   LoggerFunction,
 } from "../logging.handler";
-import { HttpStatusCode, UnauthorizedException, BadRequestException, NotFoundException } from "..";
+import {
+  HttpStatusCode,
+  UnauthorizedException,
+  BadRequestException,
+  NotFoundException,
+} from "..";
 
 class TestLogging implements LoggerInterface {
   public result?: string;

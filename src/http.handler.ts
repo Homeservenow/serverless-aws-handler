@@ -20,7 +20,10 @@ import {
 } from "./interfaces";
 
 const createOptions = <RequestType, ResponseType>(
-  handlerOptionsOrFunction: HttpHandlerFunctionOrOptions<RequestType, ResponseType>,
+  handlerOptionsOrFunction: HttpHandlerFunctionOrOptions<
+    RequestType,
+    ResponseType
+  >,
 ): HttpHandlerFunctionBuiltOptions<RequestType, ResponseType> => {
   const defaultOptions: HttpHandlerDefaultOptions<RequestType, ResponseType> = {
     errorHandler: httpErrorHandler,

@@ -20,11 +20,11 @@ $ yarn add @homeservenow/serverless-aws-handler
  ## Usage
 
  ```typescript
-import {httpHandler, NotFoundException} from '@homeservenow/serverless-aws-handler';
-import {APIGatewayEvent} from 'aws-lambda';
-import {database} from './database';
+import { httpHandler, NotFoundException } from '@homeservenow/serverless-aws-handler';
+import { APIGatewayEvent } from 'aws-lambda';
+import { database } from './database';
 
-export const getCatHandler = httpHandler(async (event: APIGatewayEvent): Promise<CatInterface> => {
+export const getCatHandler = httpHandler(async ({event}): Promise<CatInterface> => {
     const cat = await database().findById(event?.pathParameters.id);
 
     if (!cat) {
@@ -57,29 +57,28 @@ Or if `NotFoundException` is thrown, a 404 status code (because of NotFoundExcep
 You'll notice in this example, we're returning validation errors!
 
 ```typescript
-import {httpHandler, NotFoundException, BadRequestException} from '@homeservenow/serverless-aws-handler';
-import {APIGatewayEvent} from 'aws-lambda';
-import {database} from './database';
+import { httpHandler, BadRequestException } from '@homeservenow/serverless-aws-handler';
+import { database } from './database';
 
-export const createCatHandler = httpHandler<Partial<CatInterface>>(async (
-        event: APIGatewayJsonEvent<Partial<CatInterface>>,
-    ): Promise<CatInterface | never> => {
+export const createCatHandler = httpHandler<CatInterface>({
+    validator: (payload: any): CatInterface => {
+        const validationErrors = {};
 
-    const payload = event.json;
+        (["breed", "name", "lives"] as (keyof CatInterface)[]).forEach((property) => {
+            if (!payload[property]) {
+                validationErrors[property] = 'Cannot be blank!';
+            }
+        });
 
-    const validationErrors = {};
-
-    (["breed", "name", "lives"] as (keyof CatInterface)[]).forEach((property) => {
-        if (!payload[property]) {
-            validationErrors[property] = 'Cannot be blank!';
+        if (Object.keys(validationErrors).length >= 1) {
+            throw new BadRequestException('Validaiton Errors', validationErrors);
         }
-    });
 
-    if (Object.keys(validationErrors).length >= 1) {
-        throw new BadRequestException('Validaiton Errors', validationErrors);
-    }
-
-    return database().create(payload);
+        return new CatDTO(payload);
+    },
+    handler: async ({payload}): Promise<CatInterface | never> => {
+        return database().create(payload);
+    },
 });
 ```
 If validation errors occur then the handler will return a 400 status code plus the below body
@@ -90,6 +89,33 @@ If validation errors occur then the handler will return a 400 status code plus t
     "data": {
         "name": "Cannot be blank!"
     }
+}
+```
+
+### Not Found example
+
+```typescript
+import { httpHandler, NotFoundException } from '@homeservenow/serverless-aws-handler';
+import {database} from './database';
+
+export const getCatHandler = httpHandler<CatInterface>({
+    handler: async ({event}): Promise<CatInterface | never> => {
+
+        const cat = await database().find(event?.pathParameters.id);
+
+        if (!cat) {
+            throw new NotFoundException();
+        }
+
+        return cat;
+    },
+});
+```
+
+Results in a 404 with the payload
+```JSON
+{
+    "message": "Not Found"
 }
 ```
 
@@ -104,6 +130,39 @@ Exception name | status code | default message
 `UnProcessableEntityException` | 422 | 'Unprocessable Entity
 `InternalServerError` | 500 | Internal Server Error
 
+## Available options 
+
+```typescript
+
+export const getCatHandler = httpHandler<InputInterface, Array<string>>({
+    handler: async ({event}): Promise<InputInterface | never> => { // your handler
+        return Promise.resolve('hello!');
+    },
+    validator: (value: any): InputInterface => { // validation method
+        if (!value.input) {
+            throw new BadRequestException();
+        }
+
+        return value as InputInterface;
+    },
+    defaultStatus: HttpStatusCode.NO_CONTENT, // default status code
+    defaultOutputHeaders: { // default return headers
+        ['X-header']: `true`,
+    },
+    logger: (
+        errorHandlingOptions: ErrorHandlingOptionsType,
+        error: Error | HttpErrorException,
+    ) => { // customise the logging output
+        console.error(error);
+    },
+    loggingHandlingOptions: HttpStatusCode.NOT_FOUND_EXCEPTION, // only log 404 errors
+    serialise: {
+        input: (event: APIGatewayEvent): any => event.body.split(''), // customised input
+        output: (output: Array<string>): string => output.join(''), //customised body output
+    },
+});
+```
+
 ## Validator
 
 ```typescript
@@ -114,9 +173,45 @@ export const myHandler = httpHandler({
 
 ## Serialisation
 
-#### Input
+By default, the http handler method will serialise the event body using JSON.parse. If you wish to serialise using a different method you can provide your custom method. The default for output is to convert the response from your handler to JSON.
 
+#### Input
+```typescript
+export const myHandler = httpHandler({
+    handler: ({body}) => {
+        return body; // body is returned from input method
+    },
+    defaultStatusCode: HttpStatusCode.NO_CONTENT,
+    serialise: {
+        input: (event: APIGatewayEvent): any => JSON.parse(event.body),
+    },
+});
+```
 #### Output
+
+```typescript
+interface UserInterface =  {
+    password: string;
+    email: string;
+};
+
+export const myHandler = httpHandler<undefined, UserInterface>({
+    handler: (): UserInterface => {
+        return {
+            email: 'iam@email.com',
+            password: 'hello!Ishould-not-be-returned!',
+        };
+    },
+    defaultStatusCode: HttpStatusCode.NO_CONTENT,
+    serialise: {
+        output: (result: UserInterface): string => {
+            delete result.password;
+
+            return JSON.stringify(result);
+        },
+    },
+});
+```
 
 ## Custom Error Handling
 
@@ -126,7 +221,7 @@ The below example will always output a status code of 204.
 
 ```typescript
 export const myHandler = httpHandler({
-    handler: (event: APIGatwayProxyEvent) => {
+    handler: () => {
 
     },
     defaultStatusCode: HttpStatusCode.NO_CONTENT,
@@ -138,7 +233,7 @@ The below example will always output a header `X-header`
 
 ```typescript
 export const myHandler = httpHandler({
-    handler: (event: APIGatwayProxyEvent) => {
+    handler: () => {
 
     },
     defaultHeaders: {

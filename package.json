@@ -10,7 +10,7 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "author": "Ashleigh Simonelli <aaryanna.homeserve@gmail.com>",
+  "author": "Ashleigh Simonelli <aaryanna.simonelli@homeserve.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/Homeservenow/serverless-aws-handler"

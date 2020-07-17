@@ -162,10 +162,39 @@ export const getCatHandler = httpHandler<InputInterface, Array<string>>({
 ```
 
 ## Validator
+The validator method is for validating the incoming structure and returned the `RequestType` or required payload type for your given handler.
 
 ```typescript
-export const myHandler = httpHandler({
-    handler: myHandlerMethod,
+class CatDTO {
+    constructor(
+        readonly name: string,
+        readonly breed: BreedEnum,
+        readonly lives: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
+    ) {}
+}
+export const myHandler = httpHandler<CatDTO>({
+    handler: ({payload}) => {
+        console.log(payload.name, payload.breed, payload.lives);
+    },
+    validator: (value: any): CatDTO => {
+        const cat = new CatDTO(value);
+
+        const validationErrors = {};
+
+        if (!cat.name) {
+            validationErrors.name = 'Name is required';
+        }
+
+        if (cat.lives > 9) {
+            validationErrors.lives = 'A cat cannot have more than 9 lives';
+        }
+
+        if (validationErrors.length >= 1) {
+            throw new BadRequestException('Validation Errors', validationErrors);
+        }
+
+        return cat;
+    },
 });
 ```
 

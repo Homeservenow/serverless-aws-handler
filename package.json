@@ -8,6 +8,8 @@
     "handler",
     "wrapper"
   ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Ashleigh Simonelli <aaryanna.homeserve@gmail.com>",
   "repository": {
     "type": "git",

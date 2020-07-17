@@ -15,8 +15,10 @@ $ yarn add @homeservenow/serverless-aws-handler
 #### Features
  - Error logging
  - Error handling - throwable exceptions that correspond to status codes
- - Payload serialisation
+ - Payload deserialisation/serialisation
+ - Validation + payload structuring
  - Strong types :muscle:
+ - Completely customisable - use your favourite solutions
  
 ## Usage
 

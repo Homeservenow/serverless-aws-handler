@@ -132,6 +132,8 @@ Exception name | status code | default message
 
 ## Available options 
 
+This is an example of all available options. All have default methods and values.
+
 ```typescript
 
 export const getCatHandler = httpHandler<InputInterface, Array<string>>({
@@ -214,6 +216,31 @@ export const myHandler = httpHandler<undefined, UserInterface>({
 ```
 
 ## Custom Error Handling
+
+All exceptions thrown will be handled by the error handler which will convert the exception into a response object. You can override this function by providing a custom method. You could even filter out specific exceptions and return the default
+
+```typescript
+export const myHandler = httpHandler<any>({
+    handler: ({payload}) => {
+        if (!payload) {
+            throw new BadRequestException();
+        }
+
+        if (!payload.id) {
+            throw new UnprocessableEntityException();
+        }
+    },
+    errorHandler: (error: HttpErrorResponseInterface | Error): APIGatewayProxyResult => {
+        if (isHttpErrorException(error) && error instanceof BadRequestException) {
+            return {
+                statusCode: httpStatusCode.NO_CONTENT,
+            };
+        }
+
+        return httpErrorHandler(error);
+    },
+});
+```
 
 ## Default status code and headers
 

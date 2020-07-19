@@ -1,5 +1,6 @@
 import {
   httpHandler,
+  PromisifiedAPIGatewayProxyHandler,
   NotFoundException,
   HttpStatusCode,
   UnprocessableEntityException,
@@ -10,12 +11,20 @@ import {
 } from "..";
 import { createMockAPIGatewayEvent } from "./events";
 import * as mockContext from "aws-lambda-mock-context";
+import { APIGatewayProxyHandler } from "aws-lambda";
 
 const testHttpMethod = httpHandler(async () => {
   return {
     test: true,
   };
 });
+
+describe("PromisifiedAPIGatewayProxyHandler", () => {
+  it("Can be assigned to ApiGatewayProxyHandler", () => {
+    const testItWorks = (handler: APIGatewayProxyHandler) => handler;
+    testItWorks(testHttpMethod);
+  })
+})
 
 describe("HttpHandler", () => {
   const context = mockContext();
@@ -24,10 +33,9 @@ describe("HttpHandler", () => {
     const result = await testHttpMethod(
       createMockAPIGatewayEvent({}),
       context,
-      () => {},
     );
 
-    expect(result && result.statusCode).toBe(HttpStatusCode.OK);
+    expect(result.statusCode).toBe(HttpStatusCode.OK);
   });
 
   it("Can have different default return value", async () => {
@@ -43,47 +51,36 @@ describe("HttpHandler", () => {
     const result = await testHttpMethod(
       createMockAPIGatewayEvent({}),
       context,
-      () => {},
     );
 
-    expect(result && result.statusCode).toBe(HttpStatusCode.NO_CONTENT);
+    expect(result.statusCode).toBe(HttpStatusCode.NO_CONTENT);
   });
 
   describe("Can return http exceptions using exceptions", () => {
     it("NotFoundException", async () => {
       const testHttpMethod = httpHandler(async () => {
         throw new NotFoundException();
-
-        return {
-          test: true,
-        };
       });
 
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
-        () => {},
       );
 
-      expect(result && result.statusCode).toBe(HttpStatusCode.NOT_FOUND);
+      expect(result.statusCode).toBe(HttpStatusCode.NOT_FOUND);
     });
 
     it("UnprocessableEntityException", async () => {
       const testHttpMethod = httpHandler(async () => {
         throw new UnprocessableEntityException();
-
-        return {
-          test: true,
-        };
       });
 
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
-        () => {},
       );
 
-      expect(result && result.statusCode).toBe(
+      expect(result.statusCode).toBe(
         HttpStatusCode.UNPROCESSABLE_ENTITY,
       );
     });
@@ -91,95 +88,66 @@ describe("HttpHandler", () => {
     it("BadRequestException", async () => {
       const testHttpMethod = httpHandler(async () => {
         throw new BadRequestException();
-
-        return {
-          test: true,
-        };
       });
 
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
-        () => {},
       );
 
-      expect(result && result.statusCode).toBe(HttpStatusCode.BAD_REQUEST);
+      expect(result.statusCode).toBe(HttpStatusCode.BAD_REQUEST);
     });
 
     it("UnauthorizedException", async () => {
       const testHttpMethod = httpHandler(async () => {
         throw new UnauthorizedException();
-
-        return {
-          test: true,
-        };
       });
 
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
-        () => {},
       );
 
-      expect(result && result.statusCode).toBe(HttpStatusCode.UNAUTHORIZED);
+      expect(result.statusCode).toBe(HttpStatusCode.UNAUTHORIZED);
     });
 
     it("InternalServerException", async () => {
       const testHttpMethod = httpHandler(async () => {
         throw new Error();
-
-        return {
-          test: true,
-        };
       });
 
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
-        () => {},
       );
 
-      expect(result && result.statusCode).toBe(
-        HttpStatusCode.INTERNAL_SERVER_ERROR,
-      );
+      expect(result.statusCode).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
     });
 
     it("InternalServerException", async () => {
       const testHttpMethod = httpHandler(async () => {
         throw new InternalServerError();
-
-        return {
-          test: true,
-        };
       });
 
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
-        () => {},
       );
 
-      expect(result && result.statusCode).toBe(
-        HttpStatusCode.INTERNAL_SERVER_ERROR,
-      );
+      expect(result.statusCode).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
     });
 
     it("ForbiddenException", async () => {
       const testHttpMethod = httpHandler(async () => {
         throw new ForbiddenException();
-
-        return {
-          test: true,
-        };
       });
 
       const result = await testHttpMethod(
         createMockAPIGatewayEvent({}),
         context,
-        () => {},
       );
 
-      expect(result && result.statusCode).toBe(HttpStatusCode.FORBIDDEN);
+      expect(result.statusCode).toBe(HttpStatusCode.FORBIDDEN);
     });
   });
 
@@ -192,7 +160,7 @@ describe("HttpHandler", () => {
       });
 
       expect(
-        await testHttpMethod(createMockAPIGatewayEvent({}), context, () => {}),
+        await testHttpMethod(createMockAPIGatewayEvent({}), context),
       ).toStrictEqual({ statusCode: HttpStatusCode.UNPROCESSABLE_ENTITY });
     });
 
@@ -204,7 +172,7 @@ describe("HttpHandler", () => {
       });
 
       expect(
-        await testHttpMethod(createMockAPIGatewayEvent({}), context, () => {}),
+        await testHttpMethod(createMockAPIGatewayEvent({}), context),
       ).toStrictEqual({ body: "test", statusCode: 200 });
     });
 
@@ -222,7 +190,7 @@ describe("HttpHandler", () => {
       });
 
       expect(
-        await testHttpMethod(createMockAPIGatewayEvent({}), context, () => {}),
+        await testHttpMethod(createMockAPIGatewayEvent({}), context),
       ).toStrictEqual({
         body: '{"someString":"hello"}',
         statusCode: 201,
@@ -256,7 +224,6 @@ describe("HttpHandler", () => {
             body: "{}",
           }),
           context,
-          () => {},
         ),
       ).toStrictEqual({
         statusCode: HttpStatusCode.BAD_REQUEST,

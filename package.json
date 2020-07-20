@@ -1,6 +1,6 @@
 {
   "name": "@homeservenow/serverless-aws-handler",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "keywords": [
     "aws",
     "serverless",

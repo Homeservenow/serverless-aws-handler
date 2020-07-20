@@ -59,9 +59,7 @@ export const createLoggingHandler = (
           }
 
           if (
-            statusCode &&
-            errorHandlingOptions.blacklist &&
-            errorHandlingOptions.blacklist.includes(statusCode)
+            errorHandlingOptions?.blacklist?.includes(statusCode)
           ) {
             log = false;
           } else {
@@ -69,8 +67,7 @@ export const createLoggingHandler = (
               log = true;
             } else if (
               statusCode &&
-              errorHandlingOptions.whitelist &&
-              errorHandlingOptions.whitelist.includes(statusCode)
+              errorHandlingOptions?.whitelist.includes(statusCode)
             ) {
               log = true;
             }
@@ -78,7 +75,7 @@ export const createLoggingHandler = (
           break;
 
         case "number":
-          if (statusCode && statusCode === errorHandlingOptions) {
+          if (statusCode === errorHandlingOptions) {
             log = true;
           }
           break;

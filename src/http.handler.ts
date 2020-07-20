@@ -71,11 +71,11 @@ export const httpHandler = <RequestType extends any, ResponseType extends any>(
         ? options.serialise.input(event)
         : JSONParse(event);
 
-      const payload = options.validator
+      const body = options.validator
         ? options.validator(deserialisedPayload)
         : deserialisedPayload;
 
-      const result = await options.handler({ payload, event, context });
+      const result = await options.handler({ body, event, context });
 
       if (isResponseType(result)) {
         if (!result.hasOwnProperty("statusCode")) {

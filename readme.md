@@ -78,8 +78,8 @@ export const createCatHandler = httpHandler<CatInterface>({
 
         return new CatDTO(payload);
     },
-    handler: async ({payload}): Promise<CatInterface | never> => {
-        return database().create(payload);
+    handler: async ({body}): Promise<CatInterface | never> => {
+        return database().create(body);
     },
 });
 ```
@@ -176,8 +176,8 @@ class CatDTO {
     ) {}
 }
 export const myHandler = httpHandler<CatDTO>({
-    handler: ({payload}) => {
-        console.log(payload.name, payload.breed, payload.lives);
+    handler: ({body}) => {
+        console.log(body.name, body.breed, body.lives);
     },
     validator: (value: any): CatDTO => {
         const cat = new CatDTO(value);
@@ -249,12 +249,12 @@ All exceptions thrown will be handled by the error handler which will convert th
 
 ```typescript
 export const myHandler = httpHandler<any>({
-    handler: ({payload}) => {
-        if (!payload) {
+    handler: ({body}) => {
+        if (!body) {
             throw new BadRequestException();
         }
 
-        if (!payload.id) {
+        if (!body.id) {
             throw new UnprocessableEntityException();
         }
     },

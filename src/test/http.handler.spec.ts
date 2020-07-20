@@ -202,19 +202,19 @@ describe("HttpHandler", () => {
   describe("Can return additional exception data", () => {
     it("Can return validation errors", async () => {
       const validationErrorsHanlder = httpHandler<{ name?: string }, void>(
-        async ({ event, payload }) => {
-          if (!event.body || !payload.name) {
+        async ({ event, body }) => {
+          if (!event.body || !body.name) {
             throw new BadRequestException("Validation errors", [
               {
-                target: payload,
+                target: body,
                 property: "name",
-                value: payload.name,
+                value: body.name,
                 reason: "Name is required",
               },
             ]);
           }
 
-          console.log("valid", payload.name);
+          console.log("valid", body.name);
         },
       );
 

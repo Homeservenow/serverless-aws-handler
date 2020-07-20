@@ -19,7 +19,7 @@ export type ResponseSerialiserFunction<ResponseType> = (
 ) => string;
 
 export type HttpHandlerFunction<RequestType, ResponseType> = (input: {
-  payload: RequestType;
+  body: RequestType;
   event: APIGatewayEvent;
   context: Context;
 }) => Promise<

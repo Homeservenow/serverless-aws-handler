@@ -42,7 +42,7 @@ describe("Decorator", () => {
         context,
       ),
     ).resolves.toEqual({
-      body: "{\"foo\":\"bar\"}",
+      body: '{"foo":"bar"}',
       statusCode: HttpStatusCode.OK,
       headers: {
         "Content-Type": "application/json",

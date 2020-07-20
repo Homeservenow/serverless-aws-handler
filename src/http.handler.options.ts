@@ -34,8 +34,8 @@ export const createDecoratorOptions = <ResponseType>(
   handlerOptions?: HttpHandlerDecoratorOptions<ResponseType>,
 ): HttpHandlerDecoratorBuiltOptions<ResponseType> => {
   const defaultOptions = getDefaultOptions<void, ResponseType>();
-  return merge(defaultOptions, handlerOptions)
-}
+  return merge(defaultOptions, handlerOptions);
+};
 
 export const createOptions = <RequestType, ResponseType>(
   handlerOptionsOrFunction: HttpHandlerFunctionOrOptions<

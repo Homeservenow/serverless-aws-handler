@@ -13,19 +13,16 @@ export const HttpHandlerDecorator = <ResponseType>(
   const fullOptions = createDecoratorOptions<ResponseType>(options);
   const newHandler: APIGatewayProxyHandler = async (
     event,
-    context
+    context,
   ): Promise<APIGatewayProxyResult> => {
     try {
       const result = await originalHandler(event, context);
       return result;
     } catch (error) {
-      fullOptions.logger(
-        fullOptions.loggingOptions,
-        error,
-      );
-      return fullOptions.errorHandler(error)
+      fullOptions.logger(fullOptions.loggingOptions, error);
+      return fullOptions.errorHandler(error);
     }
-  }
+  };
 
   descriptor.value = newHandler;
 };

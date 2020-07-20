@@ -17,3 +17,4 @@ export const isHttpErrorException = (obj: any): obj is HttpErrorException =>
   obj instanceof HttpErrorException;
 
 export * from "./json.parse";
+export * from "./default.validator";

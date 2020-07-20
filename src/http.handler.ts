@@ -1,54 +1,14 @@
-import { isResponseType } from "./utils";
-import {
-  httpResponseHandler,
-  httpResponsePayloadHandler,
-} from "./http.response.handler";
-import { httpErrorHandler } from "./http.error.handler";
-import { HttpStatusCode } from "./enum";
+import { isResponseType as isApiGatewayResponse } from "./utils";
+import { httpResponseBuilder } from "./http.response.builder";
 import {
   APIGatewayEvent,
   Context,
   APIGatewayProxyEvent,
   APIGatewayProxyResult,
 } from "aws-lambda";
-import { createLoggingHandler } from "./logging.handler";
-import { JSONParse } from "./utils/json.parse";
-import {
-  HttpHandlerFunctionOrOptions,
-  HttpHandlerDefaultOptions,
-  HttpHandlerFunctionBuiltOptions,
-} from "./interfaces";
+import { createOptions } from "./http.handler.options";
+import { HttpHandlerFunctionOrOptions } from "./interfaces";
 
-const createOptions = <RequestType, ResponseType>(
-  handlerOptionsOrFunction: HttpHandlerFunctionOrOptions<
-    RequestType,
-    ResponseType
-  >,
-): HttpHandlerFunctionBuiltOptions<RequestType, ResponseType> => {
-  const defaultOptions: HttpHandlerDefaultOptions<RequestType, ResponseType> = {
-    errorHandler: httpErrorHandler,
-    logger: createLoggingHandler(),
-    defaultStatusCode: HttpStatusCode.OK,
-    loggingOptions: [
-      HttpStatusCode.BAD_REQUEST,
-      HttpStatusCode.NETWORK_READ_TIMEOUT,
-    ],
-    serialise: {
-      input: JSONParse,
-      output: httpResponsePayloadHandler,
-    },
-  };
-
-  return typeof handlerOptionsOrFunction === "function"
-    ? {
-        ...defaultOptions,
-        handler: handlerOptionsOrFunction,
-      }
-    : {
-        ...defaultOptions,
-        ...handlerOptionsOrFunction,
-      };
-};
 export type PromisifiedAPIGatewayProxyHandler = (event: APIGatewayProxyEvent, context: Context) => Promise<APIGatewayProxyResult>
 
 /**
@@ -67,49 +27,39 @@ export const httpHandler = <RequestType extends any, ResponseType extends any>(
 
   return new Promise(async (resolve) => {
     try {
-      const deserialisedPayload = options.serialise.input
-        ? options.serialise.input(event)
-        : JSONParse(event);
+      const deserialisedPayload = options.serialise.input(event);
 
-      const body = options.validator
-        ? options.validator(deserialisedPayload)
-        : deserialisedPayload;
+      const body = options.validator(deserialisedPayload);
 
       const result = await options.handler({ body, event, context });
 
-      if (isResponseType(result)) {
+      if (isApiGatewayResponse(result)) {
         if (!result.hasOwnProperty("statusCode")) {
           result.statusCode = options.defaultStatusCode;
         }
 
-        if (result.body)
-          result.body = options.serialise.output
-            ? options.serialise.output(result.body)
-            : httpResponsePayloadHandler(result.body);
+        if (result.body) {
+          result.body = options.serialise.output(result.body);
+        }
 
         resolve(result);
       }
 
       resolve(
-        httpResponseHandler(
+        httpResponseBuilder(
           result,
           options.defaultStatusCode,
-          options?.serialise?.output || httpResponsePayloadHandler,
+          options.serialise.output,
           options.defaultOutputHeaders,
         ),
       );
     } catch (error) {
       options.logger(
-        options.loggingOptions || [
-          HttpStatusCode.BAD_REQUEST,
-          HttpStatusCode.NETWORK_READ_TIMEOUT,
-        ],
+        options.loggingOptions,
         error,
       );
       resolve(
-        options.errorHandler
-          ? options.errorHandler(error)
-          : httpErrorHandler(error),
+        options.errorHandler(error)
       );
     }
   });

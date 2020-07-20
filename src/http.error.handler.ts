@@ -21,8 +21,6 @@ export const httpErrorHandler: ErrorHandlerFunction = (
     isHttpErrorException(error) && error.hasData()
       ? JSON.stringify({ message: error.getMessage(), data: error.getData() })
       : JSON.stringify({
-          message: isHttpErrorException(error)
-            ? error.getMessage()
-            : HttpStatusCode.INTERNAL_SERVER_ERROR,
+          message: error.message,
         }),
 });

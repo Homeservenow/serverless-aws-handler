@@ -3,17 +3,17 @@ import { HttpStatusCode } from "./enum";
 import { APIGatewayProxyResult } from "aws-lambda";
 import { ResponseSerialiserFunction } from "./interfaces";
 
-export const httpResponsePayloadHandler: ResponseSerialiserFunction<any> = (
+export const httpResponsePayloadSerialiser: ResponseSerialiserFunction<any> = (
   payload: any,
 ): string => (isObject(payload) ? JSON.stringify(payload) : String(payload));
 
-export const httpResponseHandler = (
+export const httpResponseBuilder = (
   payload: any,
   statusCode: HttpStatusCode,
-  httpResponsePayloadHandler: ResponseSerialiserFunction<any>,
+  httpResponsePayloadSerialiser: ResponseSerialiserFunction<any>,
   headers?: { [s: string]: string },
 ): APIGatewayProxyResult => ({
-  body: httpResponsePayloadHandler(payload),
+  body: httpResponsePayloadSerialiser(payload),
   statusCode,
   headers,
 });

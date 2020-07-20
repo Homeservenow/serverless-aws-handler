@@ -13,60 +13,57 @@ export interface HttpErrorResponseInterface extends Error {
 export type ResponseSerialiserFunction<ResponseType> = (
   value:
     | ResponseType
-    | APIGatewayProxyResult
     | Partial<APIGatewayProxyResult>
     | any,
 ) => string;
 
-export type HttpHandlerFunction<RequestType, ResponseType> = (input: {
+export type HttpHandlerInput<RequestType> = {
   body: RequestType;
   event: APIGatewayEvent;
   context: Context;
-}) => Promise<
-  void | Partial<APIGatewayProxyResult> | APIGatewayProxyResult | ResponseType
->;
+};
 
-export type HttpHandlerOptions<RequestType, ResponseType> = {
-  errorHandler?: ErrorHandlerFunction;
+export type HttpHandlerFunction<RequestType, ResponseType> = (
+  input: HttpHandlerInput<RequestType>,
+) => Promise<void | Partial<APIGatewayProxyResult> | ResponseType>;
+
+export interface HttpHandlerDecoratorBuiltOptions<ResponseType> {
   defaultStatusCode?: HttpStatusCode;
   defaultOutputHeaders?: { [s: string]: string };
-  logger?: LoggerFunction;
-  validator?: ValidatorFunction<RequestType>;
-  serialise?: {
-    input?: (value: APIGatewayEvent) => any;
-    output?: ResponseSerialiserFunction<ResponseType>;
+  errorHandler: ErrorHandlerFunction;
+  logger: LoggerFunction;
+  loggingOptions: ErrorHandlingOptionsType;
+  serialise: {
+    output: ResponseSerialiserFunction<ResponseType>;
   };
-  loggingOptions?: ErrorHandlingOptionsType;
-};
+}
+
+export type HttpHandlerDecoratorOptions<ResponseType> = Partial<HttpHandlerDecoratorBuiltOptions<ResponseType>>;
+
+export interface HttpHandlerOptions<RequestType, ResponseType>
+  extends HttpHandlerDecoratorOptions<ResponseType> {
+  validator?: ValidatorFunction<RequestType>;
+  handler: HttpHandlerFunction<RequestType, ResponseType>;
+}
 
 export type HttpHandlerFunctionOrOptions<RequestType, ResponseType> =
-  | ({
-      handler: HttpHandlerFunction<RequestType, ResponseType>;
-    } & HttpHandlerOptions<RequestType, ResponseType>)
+  | HttpHandlerOptions<RequestType, ResponseType>
   | HttpHandlerFunction<RequestType, ResponseType>;
 
-export type HttpHandlerFunctionBuiltOptions<RequestType, ResponseType> = {
+export interface HttpHandlerDefaultOptions<RequestType, ResponseType> {
   errorHandler: ErrorHandlerFunction;
   defaultStatusCode: HttpStatusCode;
-  defaultOutputHeaders?: { [s: string]: string };
   logger: LoggerFunction;
-  validator?: ValidatorFunction<RequestType>;
-  serialise: {
-    input?: (value: APIGatewayEvent) => any;
-    output?: ResponseSerialiserFunction<ResponseType>;
-  };
   loggingOptions: ErrorHandlingOptionsType;
-  handler: HttpHandlerFunction<RequestType, ResponseType>;
-};
-
-export type HttpHandlerDefaultOptions<RequestType, ResponseType> = {
-  errorHandler: ErrorHandlerFunction;
-  defaultStatusCode: HttpStatusCode;
-  logger: LoggerFunction;
-  validator?: ValidatorFunction<RequestType>;
+  validator: ValidatorFunction<RequestType>;
   serialise: {
     input: (value: APIGatewayEvent) => any;
     output: ResponseSerialiserFunction<ResponseType>;
   };
-  loggingOptions: ErrorHandlingOptionsType;
-};
+}
+
+export interface HttpHandlerFunctionBuiltOptions<RequestType, ResponseType>
+  extends HttpHandlerDefaultOptions<RequestType, ResponseType> {
+  defaultOutputHeaders?: { [s: string]: string };
+  handler: HttpHandlerFunction<RequestType, ResponseType>;
+}

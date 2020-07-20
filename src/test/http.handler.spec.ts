@@ -1,6 +1,5 @@
 import {
   httpHandler,
-  PromisifiedAPIGatewayProxyHandler,
   NotFoundException,
   HttpStatusCode,
   UnprocessableEntityException,
@@ -10,7 +9,7 @@ import {
   InternalServerError,
 } from "..";
 import { createMockAPIGatewayEvent } from "./events";
-import * as mockContext from "aws-lambda-mock-context";
+import mockContext from "aws-lambda-mock-context";
 import { APIGatewayProxyHandler } from "aws-lambda";
 
 const testHttpMethod = httpHandler(async () => {

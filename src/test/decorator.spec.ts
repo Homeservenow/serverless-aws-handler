@@ -1,25 +1,65 @@
+import {
+  APIGatewayProxyResult,
+  APIGatewayProxyEvent,
+  Context,
+} from "aws-lambda";
 import { HttpHandlerDecorator } from "./../decorator";
-import * as mockContext from "aws-lambda-mock-context";
+import mockContext from "aws-lambda-mock-context";
+import { createMockAPIGatewayEvent } from "./events";
 import { HttpStatusCode } from "./../enum";
 
 describe("Decorator", () => {
-  it("Can apply decorator", async () => {
-    class TestDecorator {
-      @HttpHandlerDecorator({
-        serialise: {
-          output: (output: any) => `${output} there`,
+  const context = mockContext();
+  class TestDecorator {
+    @HttpHandlerDecorator()
+    static async test(
+      event: APIGatewayProxyEvent,
+      context: Context,
+    ): Promise<APIGatewayProxyResult> {
+      return {
+        statusCode: 200,
+        headers: {
+          "Content-Type": "application/json",
         },
-      })
-      static async test({}) {
-        return "hello";
-      }
+        body: JSON.stringify({ foo: "bar" }),
+      };
     }
-    const context = mockContext();
 
-    expect(await TestDecorator.test(context)).toStrictEqual({
-      body: "hello there",
+    @HttpHandlerDecorator()
+    static async testThrows(
+      event: APIGatewayProxyEvent,
+      context: Context,
+    ): Promise<APIGatewayProxyResult> {
+      throw new Error("uh oh");
+    }
+  }
+
+  it("Works when the function returns normally", async () => {
+    const event = createMockAPIGatewayEvent({});
+    await expect(
+      TestDecorator.test(
+        createMockAPIGatewayEvent({ body: { foo: "bar " } }),
+        context,
+      ),
+    ).resolves.toEqual({
+      body: "{\"foo\":\"bar\"}",
       statusCode: HttpStatusCode.OK,
-      headers: undefined,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  });
+
+  it("Works when the function returns normally", async () => {
+    const event = createMockAPIGatewayEvent({});
+    await expect(
+      TestDecorator.testThrows(
+        createMockAPIGatewayEvent({ body: { foo: "bar " } }),
+        context,
+      ),
+    ).resolves.toEqual({
+      body: JSON.stringify({ message: "uh oh" }),
+      statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
     });
   });
 });

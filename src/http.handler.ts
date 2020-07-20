@@ -9,7 +9,10 @@ import {
 import { createOptions } from "./http.handler.options";
 import { HttpHandlerFunctionOrOptions } from "./interfaces";
 
-export type PromisifiedAPIGatewayProxyHandler = (event: APIGatewayProxyEvent, context: Context) => Promise<APIGatewayProxyResult>
+export type PromisifiedAPIGatewayProxyHandler = (
+  event: APIGatewayProxyEvent,
+  context: Context,
+) => Promise<APIGatewayProxyResult>;
 
 /**
  * A universal wrapper function response hander for aws handlers
@@ -54,13 +57,8 @@ export const httpHandler = <RequestType extends any, ResponseType extends any>(
         ),
       );
     } catch (error) {
-      options.logger(
-        options.loggingOptions,
-        error,
-      );
-      resolve(
-        options.errorHandler(error)
-      );
+      options.logger(options.loggingOptions, error);
+      resolve(options.errorHandler(error));
     }
   });
 };

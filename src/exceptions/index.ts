@@ -5,3 +5,4 @@ export * from "./not.found.exception";
 export * from "./unpocessable.entity.exception";
 export * from "./forbidden.exception";
 export * from "./unauthorised.exception";
+export * from "./validation.exception";

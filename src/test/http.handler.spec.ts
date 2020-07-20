@@ -1,13 +1,4 @@
-import {
-  httpHandler,
-  NotFoundException,
-  HttpStatusCode,
-  UnprocessableEntityException,
-  BadRequestException,
-  UnauthorizedException,
-  ForbiddenException,
-  InternalServerError,
-} from "..";
+import { httpHandler, HttpStatusCode, BadRequestException } from "..";
 import { createMockAPIGatewayEvent } from "./events";
 import mockContext from "aws-lambda-mock-context";
 import { APIGatewayProxyHandler } from "aws-lambda";
@@ -22,17 +13,14 @@ describe("PromisifiedAPIGatewayProxyHandler", () => {
   it("Can be assigned to ApiGatewayProxyHandler", () => {
     const testItWorks = (handler: APIGatewayProxyHandler) => handler;
     testItWorks(testHttpMethod);
-  })
-})
+  });
+});
 
 describe("HttpHandler", () => {
   const context = mockContext();
 
   it("Will return 200", async () => {
-    const result = await testHttpMethod(
-      createMockAPIGatewayEvent({}),
-      context,
-    );
+    const result = await testHttpMethod(createMockAPIGatewayEvent({}), context);
 
     expect(result.statusCode).toBe(HttpStatusCode.OK);
   });
@@ -47,107 +35,9 @@ describe("HttpHandler", () => {
       defaultStatusCode: HttpStatusCode.NO_CONTENT,
     });
 
-    const result = await testHttpMethod(
-      createMockAPIGatewayEvent({}),
-      context,
-    );
+    const result = await testHttpMethod(createMockAPIGatewayEvent({}), context);
 
     expect(result.statusCode).toBe(HttpStatusCode.NO_CONTENT);
-  });
-
-  describe("Can return http exceptions using exceptions", () => {
-    it("NotFoundException", async () => {
-      const testHttpMethod = httpHandler(async () => {
-        throw new NotFoundException();
-      });
-
-      const result = await testHttpMethod(
-        createMockAPIGatewayEvent({}),
-        context,
-      );
-
-      expect(result.statusCode).toBe(HttpStatusCode.NOT_FOUND);
-    });
-
-    it("UnprocessableEntityException", async () => {
-      const testHttpMethod = httpHandler(async () => {
-        throw new UnprocessableEntityException();
-      });
-
-      const result = await testHttpMethod(
-        createMockAPIGatewayEvent({}),
-        context,
-      );
-
-      expect(result.statusCode).toBe(
-        HttpStatusCode.UNPROCESSABLE_ENTITY,
-      );
-    });
-
-    it("BadRequestException", async () => {
-      const testHttpMethod = httpHandler(async () => {
-        throw new BadRequestException();
-      });
-
-      const result = await testHttpMethod(
-        createMockAPIGatewayEvent({}),
-        context,
-      );
-
-      expect(result.statusCode).toBe(HttpStatusCode.BAD_REQUEST);
-    });
-
-    it("UnauthorizedException", async () => {
-      const testHttpMethod = httpHandler(async () => {
-        throw new UnauthorizedException();
-      });
-
-      const result = await testHttpMethod(
-        createMockAPIGatewayEvent({}),
-        context,
-      );
-
-      expect(result.statusCode).toBe(HttpStatusCode.UNAUTHORIZED);
-    });
-
-    it("InternalServerException", async () => {
-      const testHttpMethod = httpHandler(async () => {
-        throw new Error();
-      });
-
-      const result = await testHttpMethod(
-        createMockAPIGatewayEvent({}),
-        context,
-      );
-
-      expect(result.statusCode).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
-    });
-
-    it("InternalServerException", async () => {
-      const testHttpMethod = httpHandler(async () => {
-        throw new InternalServerError();
-      });
-
-      const result = await testHttpMethod(
-        createMockAPIGatewayEvent({}),
-        context,
-      );
-
-      expect(result.statusCode).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
-    });
-
-    it("ForbiddenException", async () => {
-      const testHttpMethod = httpHandler(async () => {
-        throw new ForbiddenException();
-      });
-
-      const result = await testHttpMethod(
-        createMockAPIGatewayEvent({}),
-        context,
-      );
-
-      expect(result.statusCode).toBe(HttpStatusCode.FORBIDDEN);
-    });
   });
 
   describe("Can override default response", () => {

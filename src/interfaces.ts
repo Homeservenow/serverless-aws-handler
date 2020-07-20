@@ -11,10 +11,7 @@ export interface HttpErrorResponseInterface extends Error {
 }
 
 export type ResponseSerialiserFunction<ResponseType> = (
-  value:
-    | ResponseType
-    | Partial<APIGatewayProxyResult>
-    | any,
+  value: ResponseType | Partial<APIGatewayProxyResult> | any,
 ) => string;
 
 export type HttpHandlerInput<RequestType> = {
@@ -38,7 +35,9 @@ export interface HttpHandlerDecoratorBuiltOptions<ResponseType> {
   };
 }
 
-export type HttpHandlerDecoratorOptions<ResponseType> = Partial<HttpHandlerDecoratorBuiltOptions<ResponseType>>;
+export type HttpHandlerDecoratorOptions<ResponseType> = Partial<
+  HttpHandlerDecoratorBuiltOptions<ResponseType>
+>;
 
 export interface HttpHandlerOptions<RequestType, ResponseType>
   extends HttpHandlerDecoratorOptions<ResponseType> {

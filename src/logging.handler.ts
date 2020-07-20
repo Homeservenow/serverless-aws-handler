@@ -58,9 +58,7 @@ export const createLoggingHandler = (
             break;
           }
 
-          if (
-            errorHandlingOptions?.blacklist?.includes(statusCode)
-          ) {
+          if (errorHandlingOptions?.blacklist?.includes(statusCode)) {
             log = false;
           } else {
             if (!errorHandlingOptions.whitelist) {

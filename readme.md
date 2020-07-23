@@ -94,6 +94,12 @@ If validation errors occur then the handler will return a 400 status code plus t
 }
 ```
 
+## Request handling flow
+
+Below is a flow chart of how we've implemented the `httpHandler` to handle incoming requests. This is to give you a visual representation of the different methods.
+
+<img src="./flow-chart.png">
+
 ### Not Found example
 
 ```typescript

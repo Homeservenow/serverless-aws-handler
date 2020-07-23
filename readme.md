@@ -98,7 +98,7 @@ If validation errors occur then the handler will return a 400 status code plus t
 
 Below is a flow chart of how we've implemented the `httpHandler` to handle incoming requests. This is to give you a visual representation of the different methods.
 
-<img src="./flow-chart.png">
+<img src="https://raw.githubusercontent.com/Homeservenow/serverless-aws-handler/master/flow-chart.png">
 
 ### Not Found example
 

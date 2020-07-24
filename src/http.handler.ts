@@ -32,7 +32,7 @@ export const httpHandler = <RequestType extends any, ResponseType extends any>(
     try {
       const deserialisedPayload = options.serialise.input(event);
 
-      const body = options.validator(deserialisedPayload);
+      const body = await options.validator(deserialisedPayload);
 
       const result = await options.handler({ body, event, context });
 

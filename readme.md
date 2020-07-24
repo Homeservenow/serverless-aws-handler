@@ -1,12 +1,12 @@
-## AWS Lambda generic handling for http
+## AWS Lambda handling for HTTP
 
 <a href="https://travis-ci.org/github/Homeservenow/severless-http-handler"><img src="https://api.travis-ci.org/Homeservenow/severless-http-handler.svg?branch=master" alt="travis"/></a>
 <a href='https://coveralls.io/github/Homeservenow/severless-http-handler?branch=master'><img src='https://coveralls.io/repos/github/Homeservenow/severless-http-handler/badge.svg?branch=master' alt='Coverage Status' /></a>
 <a href="https://www.npmjs.com/package/@homeservenow/serverless-aws-handler"><img src="https://img.shields.io/npm/v/@homeservenow/serverless-aws-handler" alt="npm"/></a>
 
-Generic http handling wrapper function. 
+Simple wrapper for HTTP requests to manage exceptions, guarantee a response with the correct status codes and logging the exception.
 
-## Install 
+## Install
 
 ```bash
 $ yarn add @homeservenow/serverless-aws-handler
@@ -61,6 +61,7 @@ You'll notice in this example, we're returning validation errors!
 ```typescript
 import { httpHandler, BadRequestException } from '@homeservenow/serverless-aws-handler';
 import { database } from './database';
+import { CatInterface, CatDTO } from './cat';
 
 export const createCatHandler = httpHandler<CatInterface>({
     validator: (payload: any): CatInterface => {
@@ -106,7 +107,7 @@ Below is a flow chart of how we've implemented the `httpHandler` to handle incom
 import { httpHandler, NotFoundException } from '@homeservenow/serverless-aws-handler';
 import {database} from './database';
 
-export const getCatHandler = httpHandler<CatInterface>(async ({event}): Promise<CatInterface | never> => {
+export const getCatHandler = httpHandler<CatInterface>(async ({event}): Promise<CatInterface> => {
     const cat = await database().find(event?.pathParameters.id);
 
     if (!cat) {
@@ -129,6 +130,7 @@ Results in a 404 with the payload
 Exception name | status code | default message
 ---|---|---
 `BadRequestException` | 400 | Bad Request
+`ValidationException` (extends BadRequest) | 400 | Validation Errors
 `UnauthorizedException` | 401 | Unauthorized
 `ForbiddenException` | 403 | Forbidden
 `NotFoundException` | 404 | Not Found
@@ -181,6 +183,7 @@ class CatDTO {
         readonly lives: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
     ) {}
 }
+
 export const myHandler = httpHandler<CatDTO>({
     handler: ({body}) => {
         console.log(body.name, body.breed, body.lives);
@@ -217,7 +220,6 @@ export const myHandler = httpHandler({
     handler: ({body}) => {
         return body; // body is returned from input method
     },
-    defaultStatusCode: HttpStatusCode.NO_CONTENT,
     serialise: {
         input: (event: APIGatewayEvent): any => JSON.parse(event.body),
     },
@@ -238,7 +240,6 @@ export const myHandler = httpHandler<undefined, UserInterface>({
             password: 'hello!Ishould-not-be-returned!',
         };
     },
-    defaultStatusCode: HttpStatusCode.NO_CONTENT,
     serialise: {
         output: (result: UserInterface): string => {
             delete result.password;
@@ -254,6 +255,16 @@ export const myHandler = httpHandler<undefined, UserInterface>({
 All exceptions thrown will be handled by the error handler which will convert the exception into a response object. You can override this function by providing a custom method. You could even filter out specific exceptions and return the default
 
 ```typescript
+import {
+    httpHandler,
+    BadRequestException,
+    UnprocessableEntityException,
+    isHttpErrorException,
+    httpErrorHander,
+    ErrorHandlingOptionsType,
+    HttpErrorResponseInterface,
+} from '@homeservenow/serverless-aws-lambda';
+
 export const myHandler = httpHandler<any>({
     handler: ({body}) => {
         if (!body) {
@@ -264,7 +275,10 @@ export const myHandler = httpHandler<any>({
             throw new UnprocessableEntityException();
         }
     },
-    errorHandler: (error: HttpErrorResponseInterface | Error): APIGatewayProxyResult => {
+    errorHandler: (
+        errorHandlingOptions: ErrorHandlingOptionsType,
+        error: HttpErrorResponseInterface | Error,
+    ): APIGatewayProxyResult => {
         if (isHttpErrorException(error) && error instanceof BadRequestException) {
             return {
                 statusCode: httpStatusCode.NO_CONTENT,

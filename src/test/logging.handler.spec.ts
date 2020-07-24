@@ -1,21 +1,10 @@
-import {
-  createLoggingHandler,
-  LoggerInterface,
-  LoggerFunction,
-} from "../logging.handler";
+import { createLoggingHandler, LoggerFunction } from "../logging.handler";
 import {
   HttpStatusCode,
   UnauthorizedException,
   BadRequestException,
   NotFoundException,
 } from "..";
-
-class TestLogging implements LoggerInterface {
-  public result?: string;
-  log = (message: string) => (this.result = message);
-  warn = (message: string) => (this.result = message);
-  error = (message: string) => (this.result = message);
-}
 
 describe("Logging Handling", () => {
   describe("With conosle", () => {

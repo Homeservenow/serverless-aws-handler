@@ -2,7 +2,7 @@ import merge from "lodash.merge";
 import { createLoggingHandler } from "./logging.handler";
 import { httpErrorHandler } from "./http.error.handler";
 import { httpResponsePayloadSerialiser } from "./http.response.builder";
-import { HttpStatusCode } from "./enum";
+import { HttpStatusCode } from "./enums";
 import { JSONParse, defaultValidator } from "./utils";
 import {
   HttpHandlerFunctionOrOptions,

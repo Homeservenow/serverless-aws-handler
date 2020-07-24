@@ -1,4 +1,4 @@
-import { HttpStatusCode } from "./enum";
+import { HttpStatusCode } from "./enums";
 import { ErrorHandlingOptionsType, LoggerFunction } from "./logging.handler";
 import { ErrorHandlerFunction } from "./http.error.handler";
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from "aws-lambda";

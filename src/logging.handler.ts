@@ -1,4 +1,4 @@
-import { HttpStatusCode } from "./enum";
+import { HttpStatusCode } from "./enums";
 import { HttpErrorException } from "./exceptions";
 import { isHttpErrorException } from "./utils";
 

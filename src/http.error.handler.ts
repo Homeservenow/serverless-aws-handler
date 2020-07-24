@@ -1,5 +1,5 @@
 import { HttpErrorResponseInterface } from "./interfaces";
-import { HttpStatusCode } from "./enum";
+import { HttpStatusCode } from "./enums";
 import { APIGatewayProxyResult } from "aws-lambda";
 import { isHttpErrorException } from "./utils";
 

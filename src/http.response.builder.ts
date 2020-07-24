@@ -1,5 +1,5 @@
 import { isObject } from "./utils";
-import { HttpStatusCode } from "./enum";
+import { HttpStatusCode } from "./enums";
 import { APIGatewayProxyResult } from "aws-lambda";
 import { ResponseSerialiserFunction } from "./interfaces";
 

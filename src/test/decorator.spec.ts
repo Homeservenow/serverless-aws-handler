@@ -6,7 +6,7 @@ import {
 import { HttpHandlerDecorator } from "./../decorator";
 import mockContext from "aws-lambda-mock-context";
 import { createMockAPIGatewayEvent } from "./events";
-import { HttpStatusCode } from "./../enum";
+import { HttpStatusCode } from "./../enums";
 
 describe("Decorator", () => {
   const context = mockContext();

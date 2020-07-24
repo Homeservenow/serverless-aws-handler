@@ -12,12 +12,6 @@ import {
 } from "..";
 import { createMockAPIGatewayEvent } from "./events";
 
-const testHttpMethod = httpHandler(async () => {
-  return {
-    test: true,
-  };
-});
-
 describe("Can return http exceptions using exceptions", () => {
   const context = mockContext();
 

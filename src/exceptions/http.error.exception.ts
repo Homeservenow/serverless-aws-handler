@@ -1,5 +1,5 @@
 import { HttpErrorResponseInterface } from "../interfaces";
-import { HttpStatusCode } from "../enum";
+import { HttpStatusCode } from "../enums";
 
 export class HttpErrorException extends Error
   implements HttpErrorResponseInterface {

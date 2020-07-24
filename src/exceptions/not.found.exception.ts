@@ -1,4 +1,4 @@
-import { HttpStatusCode } from "../enum";
+import { HttpStatusCode } from "../enums";
 import { HttpErrorException } from "./http.error.exception";
 
 export class NotFoundException extends HttpErrorException {

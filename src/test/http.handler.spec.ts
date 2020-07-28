@@ -68,7 +68,7 @@ describe("HttpHandler", () => {
     it("Can return response object with body, statusCode and headers", async () => {
       const testHttpMethod = httpHandler(async () => {
         return {
-          statusCode: HttpStatusCode.SUCCESS,
+          statusCode: HttpStatusCode.CREATED,
           body: {
             someString: "hello",
           },

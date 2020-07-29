@@ -27,7 +27,7 @@ import { httpHandler, NotFoundException } from '@homeservenow/serverless-aws-han
 import { database } from './database';
 
 export const getCatHandler = httpHandler(async ({event}): Promise<CatInterface> => {
-    const cat = await database().findById(event?.pathParameters.id);
+    const cat = await database().findById(event?.pathParameters?.id);
 
     if (!cat) {
         throw new NotFoundException();
@@ -108,7 +108,7 @@ import { httpHandler, NotFoundException } from '@homeservenow/serverless-aws-han
 import {database} from './database';
 
 export const getCatHandler = httpHandler<CatInterface>(async ({event}): Promise<CatInterface> => {
-    const cat = await database().find(event?.pathParameters.id);
+    const cat = await database().find(event?.pathParameters?.id);
 
     if (!cat) {
         throw new NotFoundException();
@@ -134,7 +134,7 @@ Exception name | status code | default message
 `UnauthorizedException` | 401 | Unauthorized
 `ForbiddenException` | 403 | Forbidden
 `NotFoundException` | 404 | Not Found
-`UnProcessableEntityException` | 422 | 'Unprocessable Entity
+`UnProcessableEntityException` | 422 | Unprocessable Entity
 `InternalServerError` | 500 | Internal Server Error
 
 ## Available options 

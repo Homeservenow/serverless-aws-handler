@@ -3,7 +3,9 @@ import { ErrorHandlingOptionsType, LoggerFunction } from "./logging.handler";
 import { ErrorHandlerFunction } from "./http.error.handler";
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from "aws-lambda";
 
-export type ValidatorFunction<Payload> = (value: any) => Payload | Promise<Payload>;
+export type ValidatorFunction<Payload> = (
+  value: any,
+) => Payload | Promise<Payload>;
 
 export interface HttpErrorResponseInterface extends Error {
   readonly status: HttpStatusCode;

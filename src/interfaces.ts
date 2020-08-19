@@ -33,7 +33,8 @@ export interface HttpHandlerDecoratorBuiltOptions<ResponseType> {
   logger: LoggerFunction;
   loggingOptions: ErrorHandlingOptionsType;
   serialise: {
-    output: ResponseSerialiserFunction<ResponseType>;
+    input?: (value: APIGatewayEvent) => any;
+    output?: ResponseSerialiserFunction<ResponseType>;
   };
 }
 
@@ -67,4 +68,8 @@ export interface HttpHandlerFunctionBuiltOptions<RequestType, ResponseType>
   extends HttpHandlerDefaultOptions<RequestType, ResponseType> {
   defaultOutputHeaders?: { [s: string]: string };
   handler: HttpHandlerFunction<RequestType, ResponseType>;
+  serialise: {
+    input: (value: APIGatewayEvent) => any;
+    output: ResponseSerialiserFunction<ResponseType>;
+  };
 }

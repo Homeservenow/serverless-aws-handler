@@ -3,10 +3,10 @@ import {
   APIGatewayProxyEvent,
   Context,
 } from "aws-lambda";
-import { HttpHandlerDecorator } from "./../decorator";
+import { HttpHandlerDecorator } from "./../http/decorator";
 import mockContext from "aws-lambda-mock-context";
 import { createMockAPIGatewayEvent } from "./events";
-import { HttpStatusCode } from "./../enums";
+import { HttpStatusCode } from "./../http/enums";
 
 describe("Decorator", () => {
   const context = mockContext();

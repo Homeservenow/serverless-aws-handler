@@ -3,7 +3,8 @@ import { BadRequestException } from "../exceptions";
 
 export const JSONParse = (event: APIGatewayEvent): any => {
   let json: any;
-  const contentType = event?.headers['Content-Type'] || event?.headers['content-type'] || '';
+  const contentType =
+    event?.headers["Content-Type"] || event?.headers["content-type"] || "";
 
   if (
     typeof event.body === "string" &&

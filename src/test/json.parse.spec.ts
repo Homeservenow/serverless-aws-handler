@@ -1,5 +1,5 @@
-import { JSONParse } from "./../utils";
-import { HttpStatusCode } from "./../enums";
+import { JSONParse } from "./../http/utils";
+import { HttpStatusCode } from "./../http/enums";
 import { createMockAPIGatewayEvent } from "./events";
 
 describe("JSONParse", () => {

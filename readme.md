@@ -460,6 +460,8 @@ export const handler = sqsHandler(sqs)({
         handler: async <PayloadInterface>(payload: PayloadInterface): Promise<SQSHandleActions> => {
         console.log('payload', payload);
 
+        throw new Error('Exception handler call');
+
         return Promise.resolve(SQSHandleActions.DELETE);
     },
     exceptionHandler: (record: SQSRecord): Promise<RecordResults> => Promise.resolve({
@@ -471,3 +473,26 @@ export const handler = sqsHandler(sqs)({
 
 ### Error logging
 
+Whenever an exception is thrown, a logger function is called. The default will log the error as erronous to the console. However if you wish you add your own functionality, use the `logger` property to define your own 
+
+```typescript
+import {sqsHandler, SQSHandleActions, RecordResults} from '@homeservenow/serverless-aws-handler';
+
+export const handler = sqsHandler(sqs)({
+        handler: async <PayloadInterface>(payload: PayloadInterface): Promise<SQSHandleActions> => {
+        console.log('payload', payload);
+
+        throw new Error('Exception handler call');
+
+        return Promise.resolve(SQSHandleActions.DELETE);
+    },
+    logger: (error: any): void => {
+        // Send error to sentry or whatever
+
+        console.error({
+            severity: "error",
+            error,
+        });
+    };
+});
+```

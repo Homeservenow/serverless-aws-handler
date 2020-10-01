@@ -9,7 +9,9 @@ import {
 export const SQSHandler = (sqs: SQS) => <T extends any>(
   handler: SqsHandlerFunction | PartialSqsHandlerOptions,
 ): AWSSQSHandler => {
-  const options = resolveSqsOptions(typeof handler === 'function' ? {handler} : handler);
+  const options = resolveSqsOptions(
+    typeof handler === "function" ? { handler } : handler,
+  );
 
   return async (event: SQSEvent) => {
     const records = options.filterUniqueRecords(event.Records);
@@ -20,10 +22,11 @@ export const SQSHandler = (sqs: SQS) => <T extends any>(
           const payload = options.serialise<T>(record);
 
           return { record, result: await options.handler<T>(payload) };
-        } catch {
-          // TODO add exception handling
-          // TODO add logging
-          return { record, result: SQSHandle.DEAD_LETTER };
+        } catch (error) {
+          options.logging(error);
+          return options.exceptionHandler
+            ? options.exceptionHandler(record)
+            : { record, result: SQSHandle.DEAD_LETTER };
         }
       }),
     );

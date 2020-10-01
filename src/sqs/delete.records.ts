@@ -7,7 +7,10 @@ export const getQueueUrl = (sqs: SQS, eventSourceARN: string) => {
   return `${sqs.endpoint.href}${accountId}/${queueName}`;
 };
 
-export type SqsDeleteRecords = (sqs: SQS, records: RecordResults[]) => Promise<void | PromiseResult<SQS.DeleteMessageBatchResult, AWSError>>;
+export type SqsDeleteRecords = (
+  sqs: SQS,
+  records: RecordResults[],
+) => Promise<void | PromiseResult<SQS.DeleteMessageBatchResult, AWSError>>;
 
 export const deleteRecords: SqsDeleteRecords = async (
   sqs: SQS,

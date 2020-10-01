@@ -16,6 +16,8 @@ export const SQSHandler = (sqs: SQS) => <T extends any>(
   return async (event: SQSEvent) => {
     const records = options.filterUniqueRecords(event.Records);
 
+    console.log('length', records.length);
+
     const results: RecordResults[] = await Promise.all(
       records.map(async (record) => {
         try {
@@ -26,10 +28,12 @@ export const SQSHandler = (sqs: SQS) => <T extends any>(
           options.logging(error);
           return options.exceptionHandler
             ? options.exceptionHandler(record)
-            : { record, result: SQSHandle.DEAD_LETTER };
+            : { record, result: SQSHandle.DELETE };
         }
       }),
     );
+
+    console.log('result', results);
 
     await options.deleteRecords(
       sqs,

@@ -429,7 +429,7 @@ export const handler = sqsHandler(sqs)(async <PayloadInterface>(payload: Payload
 All actions are defined in the enum `SQSHandleActions` which has the below actions 
 
 Action name | action
----|---|---
+---|--- 
 `DELETE` | Deletes the record from the queue (accepts)
 `DEAD_LETTER` | Let's AWS SQS handle the message with a dead letter (does nothing)
 

@@ -1,4 +1,4 @@
-import { RecordResults, SQSHandle, SQSHandler } from "../../sqs";
+import { RecordResults, SQSHandleActions, SQSHandler } from "../../sqs";
 import AWS, { SQS } from 'aws-sdk';
 import { mockSQSEvent } from "../events/sqs.event";
 import mockContext from "aws-lambda-mock-context";
@@ -57,8 +57,8 @@ describe('SqsHandler', () => {
     });
     const context = mockContext();
     
-    const handler = SQSHandler(sqs)(<Test>(record: Test): Promise<SQSHandle> => {
-      return Promise.resolve(SQSHandle.DELETE);
+    const handler = SQSHandler(sqs)(<Test>(record: Test): Promise<SQSHandleActions> => {
+      return Promise.resolve(SQSHandleActions.DELETE);
     });
 
     try {
@@ -100,8 +100,8 @@ describe('SqsHandler', () => {
       ],
     });
     
-    const handler = SQSHandler(sqs)(<Test>(record: Test): Promise<SQSHandle> => {
-      return Promise.resolve(SQSHandle.DELETE);
+    const handler = SQSHandler(sqs)(<Test>(record: Test): Promise<SQSHandleActions> => {
+      return Promise.resolve(SQSHandleActions.DELETE);
     });
 
     const result = await handler(records, context, () => {});
@@ -141,15 +141,15 @@ describe('SqsHandler', () => {
     });
 
     const handler = SQSHandler(sqs)({
-      handler: <Test>(record: Test): Promise<SQSHandle> => {
+      handler: <Test>(record: Test): Promise<SQSHandleActions> => {
         throw new Error('yeaaa boi');
 
-        return Promise.resolve(SQSHandle.DELETE);
+        return Promise.resolve(SQSHandleActions.DELETE);
       },
       exceptionHandler: async (record: SQSRecord): Promise<RecordResults> => {
         expect(true).toBeTruthy();
 
-        return Promise.resolve({record, result: SQSHandle.DELETE});
+        return Promise.resolve({record, result: SQSHandleActions.DELETE});
       }
     });
 

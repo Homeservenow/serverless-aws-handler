@@ -1,6 +1,6 @@
 import { SQSEvent, SQSHandler as AWSSQSHandler } from "aws-lambda";
 import { SQS } from "aws-sdk";
-import { RecordResults, SQSHandle, SqsHandlerFunction } from "./interfaces";
+import { RecordResults, SQSHandleActions, SqsHandlerFunction } from "./interfaces";
 import {
   PartialSqsHandlerOptions,
   resolveSqsOptions,
@@ -26,14 +26,14 @@ export const SQSHandler = (sqs: SQS) => <T extends any>(
           options.logging(error);
           return options.exceptionHandler
             ? options.exceptionHandler(record)
-            : { record, result: SQSHandle.DELETE };
+            : { record, result: SQSHandleActions.DELETE };
         }
       }),
     );
 
     await options.deleteRecords(
       sqs,
-      results.filter((result) => result.result === SQSHandle.DELETE),
+      results.filter((result) => result.result === SQSHandleActions.DELETE),
     );
   };
 };

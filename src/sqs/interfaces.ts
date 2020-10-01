@@ -4,17 +4,17 @@ import { SqsDeleteRecords } from "./delete.records";
 import { SqsFilterUniqueRecordsFunction } from "./filter.unique";
 import { SqsSerialiseFunction } from "./sqs.serialise";
 
-export enum SQSHandle {
+export enum SQSHandleActions {
   DEAD_LETTER = "DEAD_LETTER",
   DELETE = "DELETE",
 }
 
 export type RecordResults = {
   record: SQSRecord;
-  result: SQSHandle;
+  result: SQSHandleActions;
 };
 
-export type SqsHandlerFunction = <T>(payload: T) => Promise<SQSHandle>;
+export type SqsHandlerFunction = <T>(payload: T) => Promise<SQSHandleActions>;
 
 export type DeadletterQueueOptions = {
   Queue: string;

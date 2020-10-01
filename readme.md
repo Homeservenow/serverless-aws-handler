@@ -19,6 +19,7 @@ $ yarn add @homeservenow/serverless-aws-handler
  - Validation + payload structuring
  - Strong types :muscle:
  - Completely customisable - use your favourite solutions
+ - <a href="https://github.com/Homeservenow/serverless-http-handler#sqs-handler">SQS handling</a>
  
 ## Usage
 
@@ -404,3 +405,69 @@ export const myHandler = httpHandler({
     },
 });
 ```
+
+# SQS handler
+
+A basic wrapper for exceptions, logging and deleting messages
+
+### Basic usage
+
+```typescript
+import {sqsHandler, SQSHandleActions} from '@homeservenow/serverless-aws-handler';
+import {PayloadInterface} from './payload';
+import {sqs} from './sqs';
+
+export const handler = sqsHandler(sqs)(async <PayloadInterface>(payload: PayloadInterface): Promise<SQSHandleActions> => {
+    console.log('payload', payload);
+
+    return Promise.resolve(SQSHandleActions.DELETE);
+});
+```
+
+### Actions
+
+All actions are defined in the enum `SQSHandleActions` which has the below actions 
+
+Action name | action
+---|---|---
+`DELETE` | Deletes the record from the queue (accepts)
+`DEAD_LETTER` | Let's AWS SQS handle the message with a dead letter (does nothing)
+
+
+### Filtering
+
+For any reason you want to remove duplicated records or filter out certain properties or values, use the `filterUniqueRecords` property.
+
+```typescript
+export const handler = sqsHandler(sqs)({
+        handler: async <PayloadInterface>(payload: PayloadInterface): Promise<SQSHandleActions> => {
+        console.log('payload', payload);
+
+        return Promise.resolve(SQSHandleActions.DELETE);
+    },
+    filterUniqueRecords: (records: SQSRecord[]): SQSRecord[] => records.filter(record => record.MessageId !== 'remove'),
+});
+```
+
+### Exception handling
+
+The default exception handling function will delete your message from the queue. If you wish to handle this differently, you can use the `exceptionHandler` function to return your desired action.
+
+```typescript
+import {sqsHandler, SQSHandleActions, RecordResults} from '@homeservenow/serverless-aws-handler';
+
+export const handler = sqsHandler(sqs)({
+        handler: async <PayloadInterface>(payload: PayloadInterface): Promise<SQSHandleActions> => {
+        console.log('payload', payload);
+
+        return Promise.resolve(SQSHandleActions.DELETE);
+    },
+    exceptionHandler: (record: SQSRecord): Promise<RecordResults> => Promise.resolve({
+        record,
+        result: SQSHandleActions.DEAD_LETTER, // will do nothing
+    }),
+});
+```
+
+### Error logging
+

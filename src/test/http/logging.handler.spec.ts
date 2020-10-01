@@ -1,10 +1,10 @@
-import { createLoggingHandler, LoggerFunction } from "../http/logging.handler";
+import { createLoggingHandler, LoggerFunction } from "../../http/logging.handler";
 import {
   HttpStatusCode,
   UnauthorizedException,
   BadRequestException,
   NotFoundException,
-} from "..";
+} from "../..";
 
 describe("Logging Handling", () => {
   describe("With conosle", () => {

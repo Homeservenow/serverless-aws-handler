@@ -1,5 +1,5 @@
-import { httpHandler, HttpStatusCode, BadRequestException } from "..";
-import { createMockAPIGatewayEvent } from "./events";
+import { httpHandler, HttpStatusCode, BadRequestException } from "../..";
+import { createMockAPIGatewayEvent } from "./../events";
 import mockContext from "aws-lambda-mock-context";
 import { APIGatewayProxyHandler } from "aws-lambda";
 

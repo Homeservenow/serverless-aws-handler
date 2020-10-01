@@ -1,6 +1,6 @@
-import { JSONParse } from "./../http/utils";
-import { HttpStatusCode } from "./../http/enums";
-import { createMockAPIGatewayEvent } from "./events";
+import { JSONParse } from "./../../http/utils";
+import { HttpStatusCode } from "./../../http/enums";
+import { createMockAPIGatewayEvent } from "./../events";
 
 describe("JSONParse", () => {
   it("Can receive malformed exception", () => {

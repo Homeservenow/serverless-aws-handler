@@ -9,8 +9,8 @@ import {
   InternalServerError,
   ForbiddenException,
   ValidationException,
-} from "..";
-import { createMockAPIGatewayEvent } from "./events";
+} from "../..";
+import { createMockAPIGatewayEvent } from "./../events";
 
 describe("Can return http exceptions using exceptions", () => {
   const context = mockContext();

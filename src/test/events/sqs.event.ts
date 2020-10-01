@@ -1,6 +1,6 @@
-import {SQSEvent} from 'aws-lambda';
+import { SQSEvent } from "aws-lambda";
 
-export const mockSQSEvent = ({...args}: Partial<SQSEvent>): SQSEvent => ({
+export const mockSQSEvent = ({ ...args }: Partial<SQSEvent>): SQSEvent => ({
   Records: [],
   ...args,
 });

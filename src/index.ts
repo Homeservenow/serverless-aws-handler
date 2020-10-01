@@ -5,4 +5,4 @@ export {
   ErrorHandlingOptionsType,
   LoggerInterface,
 } from "./http/logging.handler";
-export * from './sqs';
+export * from "./sqs";

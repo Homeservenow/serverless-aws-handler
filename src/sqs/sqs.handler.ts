@@ -1,6 +1,10 @@
 import { SQSEvent, SQSHandler as AWSSQSHandler } from "aws-lambda";
 import { SQS } from "aws-sdk";
-import { RecordResults, SQSHandleActions, SqsHandlerFunction } from "./interfaces";
+import {
+  RecordResults,
+  SQSHandleActions,
+  SqsHandlerFunction,
+} from "./interfaces";
 import {
   PartialSqsHandlerOptions,
   resolveSqsOptions,

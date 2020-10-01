@@ -1,4 +1,7 @@
-import { createLoggingHandler, LoggerFunction } from "../../http/logging.handler";
+import {
+  createLoggingHandler,
+  LoggerFunction,
+} from "../../http/logging.handler";
 import {
   HttpStatusCode,
   UnauthorizedException,

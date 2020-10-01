@@ -1,11 +1,11 @@
 import { RecordResults, SQSHandleActions, SQSHandler } from "../../sqs";
-import AWS, { SQS } from 'aws-sdk';
+import AWS, { SQS } from "aws-sdk";
 import { mockSQSEvent } from "../events/sqs.event";
 import mockContext from "aws-lambda-mock-context";
 import { SQSRecord } from "aws-lambda";
 
-jest.mock('aws-sdk', () => {
-  const SQSMocked: Partial<SQS> & {promise: any} = {
+jest.mock("aws-sdk", () => {
+  const SQSMocked: Partial<SQS> & { promise: any } = {
     sendMessage: jest.fn().mockReturnThis(),
     deleteMessageBatch: jest.fn().mockReturnThis(),
     promise: jest.fn(),
@@ -18,11 +18,11 @@ jest.mock('aws-sdk', () => {
     },
   };
   return {
-    SQS: jest.fn(() => SQSMocked)
+    SQS: jest.fn(() => SQSMocked),
   };
 });
 
-describe('SqsHandler', () => {
+describe("SqsHandler", () => {
   let sqs: AWS.SQS;
 
   beforeAll(() => {
@@ -34,32 +34,33 @@ describe('SqsHandler', () => {
   });
 
   it("Successfully call sqsHandler", async () => {
-
     const records = mockSQSEvent({
-      Records: [{
-        messageId: "123456",
-        body: "{}",
-        receiptHandle: "",
-        eventSource: "",
-        attributes: {
-          SenderId: "1234",
-          ApproximateReceiveCount: '0',
-          SentTimestamp: '',
-          ApproximateFirstReceiveTimestamp: '',
+      Records: [
+        {
+          messageId: "123456",
+          body: "{}",
+          receiptHandle: "",
+          eventSource: "",
+          attributes: {
+            SenderId: "1234",
+            ApproximateReceiveCount: "0",
+            SentTimestamp: "",
+            ApproximateFirstReceiveTimestamp: "",
+          },
+          messageAttributes: {},
+          md5OfBody: "",
+          awsRegion: "eu-west-1",
+          eventSourceARN: "",
         },
-        messageAttributes: {
-
-        },
-        md5OfBody: "",
-        awsRegion: "eu-west-1",
-        eventSourceARN: "",
-      }],
+      ],
     });
     const context = mockContext();
-    
-    const handler = SQSHandler(sqs)(<Test>(record: Test): Promise<SQSHandleActions> => {
-      return Promise.resolve(SQSHandleActions.DELETE);
-    });
+
+    const handler = SQSHandler(sqs)(
+      <Test>(record: Test): Promise<SQSHandleActions> => {
+        return Promise.resolve(SQSHandleActions.DELETE);
+      },
+    );
 
     try {
       await handler(records, context, () => {});
@@ -69,70 +70,76 @@ describe('SqsHandler', () => {
     }
   });
 
-  it('handle delete', async () => {
+  it("handle delete", async () => {
     const records = mockSQSEvent({
-      Records: [{
-        messageId: "123456",
-        body: "{}",
-        receiptHandle: "",
-        eventSource: "",
-        attributes: {
-          SenderId: "1234",
-          ApproximateReceiveCount: '0',
-          SentTimestamp: '',
-          ApproximateFirstReceiveTimestamp: '',
-        },
-        messageAttributes: {
-
-        },
-        md5OfBody: "",
-        awsRegion: "eu-west-1",
-        eventSourceARN: "",
-      }],
-    });
-    const context = mockContext();
-
-    (sqs.deleteMessageBatch().promise as jest.MockedFunction<any>).mockResolvedValueOnce({
-      Successfully: [
+      Records: [
         {
-          Id: "123456",
-        },
-      ],
-    });
-    
-    const handler = SQSHandler(sqs)(<Test>(record: Test): Promise<SQSHandleActions> => {
-      return Promise.resolve(SQSHandleActions.DELETE);
-    });
-
-    const result = await handler(records, context, () => {});
-
-    expect(sqs.deleteMessageBatch().promise).toHaveBeenCalled();
-  });
-
-  it('Exception handler', async () => {
-    const records = mockSQSEvent({
-      Records: [{
           messageId: "123456",
           body: "{}",
           receiptHandle: "",
           eventSource: "",
           attributes: {
             SenderId: "1234",
-            ApproximateReceiveCount: '0',
-            SentTimestamp: '',
-            ApproximateFirstReceiveTimestamp: '',
+            ApproximateReceiveCount: "0",
+            SentTimestamp: "",
+            ApproximateFirstReceiveTimestamp: "",
           },
-          messageAttributes: {
-  
-          },
+          messageAttributes: {},
           md5OfBody: "",
           awsRegion: "eu-west-1",
           eventSourceARN: "",
-        }],
+        },
+      ],
     });
     const context = mockContext();
 
-    (sqs.deleteMessageBatch().promise as jest.MockedFunction<any>).mockResolvedValueOnce({
+    (sqs.deleteMessageBatch().promise as jest.MockedFunction<
+      any
+    >).mockResolvedValueOnce({
+      Successfully: [
+        {
+          Id: "123456",
+        },
+      ],
+    });
+
+    const handler = SQSHandler(sqs)(
+      <Test>(record: Test): Promise<SQSHandleActions> => {
+        return Promise.resolve(SQSHandleActions.DELETE);
+      },
+    );
+
+    const result = await handler(records, context, () => {});
+
+    expect(sqs.deleteMessageBatch().promise).toHaveBeenCalled();
+  });
+
+  it("Exception handler", async () => {
+    const records = mockSQSEvent({
+      Records: [
+        {
+          messageId: "123456",
+          body: "{}",
+          receiptHandle: "",
+          eventSource: "",
+          attributes: {
+            SenderId: "1234",
+            ApproximateReceiveCount: "0",
+            SentTimestamp: "",
+            ApproximateFirstReceiveTimestamp: "",
+          },
+          messageAttributes: {},
+          md5OfBody: "",
+          awsRegion: "eu-west-1",
+          eventSourceARN: "",
+        },
+      ],
+    });
+    const context = mockContext();
+
+    (sqs.deleteMessageBatch().promise as jest.MockedFunction<
+      any
+    >).mockResolvedValueOnce({
       Successfully: [
         {
           Id: "123456",
@@ -142,15 +149,15 @@ describe('SqsHandler', () => {
 
     const handler = SQSHandler(sqs)({
       handler: <Test>(record: Test): Promise<SQSHandleActions> => {
-        throw new Error('yeaaa boi');
+        throw new Error("yeaaa boi");
 
         return Promise.resolve(SQSHandleActions.DELETE);
       },
       exceptionHandler: async (record: SQSRecord): Promise<RecordResults> => {
         expect(true).toBeTruthy();
 
-        return Promise.resolve({record, result: SQSHandleActions.DELETE});
-      }
+        return Promise.resolve({ record, result: SQSHandleActions.DELETE });
+      },
     });
 
     const result = await handler(records, context, () => {});
@@ -162,8 +169,7 @@ describe('SqsHandler', () => {
           ReceiptHandle: "",
         },
       ],
-      "QueueUrl": "undefined/undefined",
+      QueueUrl: "undefined/undefined",
     });
-
   });
 });

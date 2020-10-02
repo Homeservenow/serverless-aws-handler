@@ -100,8 +100,6 @@ describe("HttpHandler", () => {
               },
             ]);
           }
-
-          console.log("valid", body.name);
         },
       );
 
@@ -125,7 +123,7 @@ describe("HttpHandler", () => {
             },
           ],
         }),
-        headers: undefined,
+        headers: {},
       });
     });
   });

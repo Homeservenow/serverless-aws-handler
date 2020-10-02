@@ -57,6 +57,7 @@ describe("Decorator", () => {
         context,
       ),
     ).resolves.toEqual({
+      headers: {},
       body: JSON.stringify({ message: "uh oh" }),
       statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
     });

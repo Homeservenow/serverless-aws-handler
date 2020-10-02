@@ -124,9 +124,9 @@ describe("SqsHandler", () => {
     });
   });
   it("With generic", async () => {
-    type TestType = {
-      test: boolean;
-    };
+    class Test {
+      constructor(readonly test: boolean) {}
+    }
 
     const records = mockSQSEvent({
       Records: [
@@ -137,29 +137,20 @@ describe("SqsHandler", () => {
     });
     const context = mockContext();
 
-    const handler = SQSHandler<TestType>(sqs)({
-      handler: (record: TestType): Promise<SQSHandleActions> => {
-        throw new Error("yeaaa boi");
+    const handler = SQSHandler<Test>(sqs)({
+      serialise: (record): Test => {
+        const json = JSON.parse(record.body);
+
+        return new Test(json);
+      },
+      handler: (record: Test): Promise<SQSHandleActions> => {
+        expect(record).toBeInstanceOf(Test);
+        expect(typeof record.test).toBe("boolean");
 
         return Promise.resolve(SQSHandleActions.DELETE);
-      },
-      exceptionHandler: async (record: SQSRecord): Promise<RecordResults> => {
-        expect(true).toBeTruthy();
-
-        return Promise.resolve({ record, result: SQSHandleActions.DELETE });
       },
     });
 
     await handler(records, context, () => {});
-
-    expect(sqs.deleteMessageBatch).toHaveBeenCalledWith({
-      Entries: [
-        {
-          Id: "123456",
-          ReceiptHandle: "",
-        },
-      ],
-      QueueUrl: "undefined/undefined",
-    });
   });
 });

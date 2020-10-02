@@ -20,9 +20,7 @@ export const httpErrorHandler: ErrorHandlerFunction = (
     : HttpStatusCode.INTERNAL_SERVER_ERROR,
   headers: {
     ...defaultHeaders,
-    ...(isHttpErrorException(error) && Object.keys(error.headers).length >= 1
-      ? error.headers
-      : {}),
+    ...(isHttpErrorException(error) ? error.headers : {}),
   },
   body:
     isHttpErrorException(error) && error.hasData()

@@ -126,5 +126,50 @@ describe("HttpHandler", () => {
         headers: {},
       });
     });
+
+    it("Can return default headers", async () => {
+      const defaultErrorHandler = httpHandler<{ name?: string }, void>({
+        defaultOutputHeaders: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        handler: async ({ event, body }) => {
+          if (!event.body || !body.name) {
+            throw new BadRequestException("Validation errors", [
+              {
+                target: body,
+                property: "name",
+                value: body.name,
+                reason: "Name is required",
+              },
+            ]);
+          }
+        },
+      });
+
+      expect(
+        await defaultErrorHandler(
+          createMockAPIGatewayEvent({
+            body: "{}",
+          }),
+          context,
+        ),
+      ).toStrictEqual({
+        statusCode: HttpStatusCode.BAD_REQUEST,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({
+          message: "Validation errors",
+          data: [
+            {
+              target: {},
+              property: "name",
+              value: undefined,
+              reason: "Name is required",
+            },
+          ],
+        }),
+      });
+    });
   });
 });

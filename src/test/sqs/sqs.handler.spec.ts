@@ -8,7 +8,7 @@ jest.mock("aws-sdk", () => {
   const SQSMocked: Partial<SQS> & { promise: any } = {
     sendMessage: jest.fn().mockReturnThis(),
     deleteMessageBatch: jest.fn().mockReturnThis(),
-    promise: jest.fn(),
+    promise: jest.fn().mockImplementation(() => Promise.resolve()),
     endpoint: {
       href: "",
       host: "",
@@ -128,6 +128,8 @@ describe("SqsHandler", () => {
       constructor(readonly test: boolean) {}
     }
 
+    let result: Test | undefined;
+
     const records = mockSQSEvent({
       Records: [
         mockSQSRecord({
@@ -141,16 +143,19 @@ describe("SqsHandler", () => {
       serialise: (record): Test => {
         const json = JSON.parse(record.body);
 
-        return new Test(json);
+        return new Test(json.test);
       },
       handler: (record: Test): Promise<SQSHandleActions> => {
-        expect(record).toBeInstanceOf(Test);
-        expect(typeof record.test).toBe("boolean");
+        result = record;
 
-        return Promise.resolve(SQSHandleActions.DELETE);
+        return Promise.resolve(SQSHandleActions.DEAD_LETTER);
       },
     });
 
     await handler(records, context, () => {});
+
+    expect.assertions(2);
+    expect(result).toBeInstanceOf(Test);
+    expect(typeof result?.test).toBe("boolean");
   });
 });

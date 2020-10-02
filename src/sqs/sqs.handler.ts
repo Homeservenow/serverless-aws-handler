@@ -21,18 +21,23 @@ export const SQSHandler = <T extends any>(sqs: SQS) => (
     const records = options.filterUniqueRecords(event.Records);
 
     const results: RecordResults[] = await Promise.all(
-      records.map(async (record) => {
-        try {
-          const payload = options.serialise(record);
+      records.map(
+        async (record) =>
+          new Promise<RecordResults>(async (resolve) => {
+            try {
+              const payload = options.serialise(record);
 
-          return { record, result: await options.handler(payload) };
-        } catch (error) {
-          options.logging(error);
-          return options.exceptionHandler
-            ? options.exceptionHandler(record)
-            : { record, result: SQSHandleActions.DELETE };
-        }
-      }),
+              resolve({ record, result: await options.handler(payload) });
+            } catch (error) {
+              options.logging(error);
+              resolve(
+                options.exceptionHandler
+                  ? options.exceptionHandler(record)
+                  : { record, result: SQSHandleActions.DELETE },
+              );
+            }
+          }),
+      ),
     );
 
     await options.deleteRecords(

@@ -1,7 +1,10 @@
 import { isObject } from "./utils";
 import { HttpStatusCode } from "./enums";
 import { APIGatewayProxyResult } from "aws-lambda";
-import { ResponseSerialiserFunction } from "./interfaces";
+import {
+  DefaultHeadersInterface,
+  ResponseSerialiserFunction,
+} from "./interfaces";
 
 export const httpResponsePayloadSerialiser: ResponseSerialiserFunction<any> = (
   payload: any,
@@ -11,7 +14,7 @@ export const httpResponseBuilder = (
   payload: any,
   statusCode: HttpStatusCode,
   httpResponsePayloadSerialiser: ResponseSerialiserFunction<any>,
-  headers?: { [s: string]: string },
+  headers?: DefaultHeadersInterface,
 ): APIGatewayProxyResult => ({
   body: httpResponsePayloadSerialiser(payload),
   statusCode,

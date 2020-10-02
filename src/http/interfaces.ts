@@ -66,10 +66,14 @@ export interface HttpHandlerDefaultOptions<RequestType, ResponseType> {
 
 export interface HttpHandlerFunctionBuiltOptions<RequestType, ResponseType>
   extends HttpHandlerDefaultOptions<RequestType, ResponseType> {
-  defaultOutputHeaders?: { [s: string]: string };
+  defaultOutputHeaders?: DefaultHeadersInterface;
   handler: HttpHandlerFunction<RequestType, ResponseType>;
   serialise: {
     input: (value: APIGatewayEvent) => any;
     output: ResponseSerialiserFunction<ResponseType>;
   };
+}
+
+export interface DefaultHeadersInterface {
+  [s: string]: string;
 }

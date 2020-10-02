@@ -58,7 +58,7 @@ export const httpHandler = <RequestType extends any, ResponseType extends any>(
       );
     } catch (error) {
       options.logger(options.loggingOptions, error);
-      resolve(options.errorHandler(error));
+      resolve(options.errorHandler(error, options.defaultOutputHeaders));
     }
   });
 };

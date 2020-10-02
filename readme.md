@@ -417,7 +417,7 @@ import {sqsHandler, SQSHandleActions} from '@homeservenow/serverless-aws-handler
 import {PayloadInterface} from './payload';
 import {sqs} from './sqs';
 
-export const handler = sqsHandler(sqs)(async <PayloadInterface>(payload: PayloadInterface): Promise<SQSHandleActions> => {
+export const handler = sqsHandler<PayloadInterface>(sqs)(async (payload: PayloadInterface): Promise<SQSHandleActions> => {
     console.log('payload', payload);
 
     return Promise.resolve(SQSHandleActions.DELETE);
@@ -439,8 +439,8 @@ Action name | action
 For any reason you want to remove duplicated records or filter out certain properties or values, use the `filterUniqueRecords` property.
 
 ```typescript
-export const handler = sqsHandler(sqs)({
-        handler: async <PayloadInterface>(payload: PayloadInterface): Promise<SQSHandleActions> => {
+export const handler = sqsHandler<PayloadInterface>(sqs)({
+    handler: async (payload: PayloadInterface): Promise<SQSHandleActions> => {
         console.log('payload', payload);
 
         return Promise.resolve(SQSHandleActions.DELETE);
@@ -456,8 +456,8 @@ The default exception handling function will delete your message from the queue.
 ```typescript
 import {sqsHandler, SQSHandleActions, RecordResults} from '@homeservenow/serverless-aws-handler';
 
-export const handler = sqsHandler(sqs)({
-        handler: async <PayloadInterface>(payload: PayloadInterface): Promise<SQSHandleActions> => {
+export const handler = sqsHandler<PayloadInterface>(sqs)({
+    handler: async (payload: PayloadInterface): Promise<SQSHandleActions> => {
         console.log('payload', payload);
 
         throw new Error('Exception handler call');
@@ -478,8 +478,8 @@ Whenever an exception is thrown, a logger function is called. The default will l
 ```typescript
 import {sqsHandler, SQSHandleActions, RecordResults} from '@homeservenow/serverless-aws-handler';
 
-export const handler = sqsHandler(sqs)({
-        handler: async <PayloadInterface>(payload: PayloadInterface): Promise<SQSHandleActions> => {
+export const handler = sqsHandler<PayloadInterface>(sqs)({
+    handler: async (payload: PayloadInterface): Promise<SQSHandleActions> => {
         console.log('payload', payload);
 
         throw new Error('Exception handler call');
@@ -493,6 +493,26 @@ export const handler = sqsHandler(sqs)({
             severity: "error",
             error,
         });
-    };
+    },
+});
+```
+## Serialising
+
+
+```typescript
+import {sqsHandler, SQSHandleActions, RecordResults} from '@homeservenow/serverless-aws-handler';
+import { CustomType } from './customType';
+
+export const handler = sqsHandler<CustomType>(sqs)({
+    handler: async (payload: CustomType): Promise<SQSHandleActions> => {
+        console.log('payload', payload);
+
+        return Promise.resolve(SQSHandleActions.DELETE);
+    },
+    serialise: (record: SQSRecord): CustomType => {
+       const json = JSON.parse(record.body);
+
+       return new CustomType(json);
+    },
 });
 ```

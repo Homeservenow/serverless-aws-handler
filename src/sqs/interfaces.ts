@@ -14,7 +14,9 @@ export type RecordResults = {
   result: SQSHandleActions;
 };
 
-export type SqsHandlerFunction = <T>(payload: T) => Promise<SQSHandleActions>;
+export type SqsHandlerFunction<T extends any> = (
+  payload: T,
+) => Promise<SQSHandleActions>;
 
 export type DeadletterQueueOptions = {
   Queue: string;
@@ -24,9 +26,9 @@ export type ExceptionHandlerFunction = (
   record: SQSRecord,
 ) => Promise<RecordResults>;
 
-export interface SqsHandlerOptionsInterface {
-  handler: SqsHandlerFunction;
-  serialise: SqsSerialiseFunction;
+export interface SqsHandlerOptionsInterface<T> {
+  handler: SqsHandlerFunction<T>;
+  serialise: SqsSerialiseFunction<T>;
   filterUniqueRecords: SqsFilterUniqueRecordsFunction;
   deleteRecords: SqsDeleteRecords;
   logging: LoggingFunction;

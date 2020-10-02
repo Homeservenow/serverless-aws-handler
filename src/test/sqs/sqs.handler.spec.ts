@@ -22,6 +22,8 @@ jest.mock("aws-sdk", () => {
   };
 });
 
+type Test = {};
+
 describe("SqsHandler", () => {
   let sqs: AWS.SQS;
 
@@ -39,8 +41,8 @@ describe("SqsHandler", () => {
     });
     const context = mockContext();
 
-    const handler = SQSHandler(sqs)(
-      <Test>(record: Test): Promise<SQSHandleActions> => {
+    const handler = SQSHandler<Test>(sqs)(
+      (record: Test): Promise<SQSHandleActions> => {
         return Promise.resolve(SQSHandleActions.DELETE);
       },
     );
@@ -69,8 +71,8 @@ describe("SqsHandler", () => {
       ],
     });
 
-    const handler = SQSHandler(sqs)(
-      <Test>(record: Test): Promise<SQSHandleActions> => {
+    const handler = SQSHandler<Test>(sqs)(
+      (record: Test): Promise<SQSHandleActions> => {
         return Promise.resolve(SQSHandleActions.DELETE);
       },
     );
@@ -96,8 +98,47 @@ describe("SqsHandler", () => {
       ],
     });
 
-    const handler = SQSHandler(sqs)({
-      handler: <Test>(record: Test): Promise<SQSHandleActions> => {
+    const handler = SQSHandler<Test>(sqs)({
+      handler: (record: Test): Promise<SQSHandleActions> => {
+        throw new Error("yeaaa boi");
+
+        return Promise.resolve(SQSHandleActions.DELETE);
+      },
+      exceptionHandler: async (record: SQSRecord): Promise<RecordResults> => {
+        expect(true).toBeTruthy();
+
+        return Promise.resolve({ record, result: SQSHandleActions.DELETE });
+      },
+    });
+
+    await handler(records, context, () => {});
+
+    expect(sqs.deleteMessageBatch).toHaveBeenCalledWith({
+      Entries: [
+        {
+          Id: "123456",
+          ReceiptHandle: "",
+        },
+      ],
+      QueueUrl: "undefined/undefined",
+    });
+  });
+  it("With generic", async () => {
+    type TestType = {
+      test: boolean;
+    };
+
+    const records = mockSQSEvent({
+      Records: [
+        mockSQSRecord({
+          body: JSON.stringify({ test: true }),
+        }),
+      ],
+    });
+    const context = mockContext();
+
+    const handler = SQSHandler<TestType>(sqs)({
+      handler: (record: TestType): Promise<SQSHandleActions> => {
         throw new Error("yeaaa boi");
 
         return Promise.resolve(SQSHandleActions.DELETE);

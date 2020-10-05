@@ -4,12 +4,11 @@ import {
   Context,
 } from "aws-lambda";
 import { HttpHandlerDecorator } from "../../http/decorator";
-import mockContext from "aws-lambda-mock-context";
 import { createMockAPIGatewayEvent } from "../events";
 import { HttpStatusCode } from "../../http/enums";
+import { context } from "./../events/mock.context";
 
 describe("Decorator", () => {
-  const context = mockContext();
   class TestDecorator {
     @HttpHandlerDecorator()
     static async test(

@@ -1,4 +1,3 @@
-import mockContext from "aws-lambda-mock-context";
 import {
   httpHandler,
   HttpStatusCode,
@@ -11,10 +10,9 @@ import {
   ValidationException,
 } from "../..";
 import { createMockAPIGatewayEvent } from "./../events";
+import { context } from "./../events/mock.context";
 
 describe("Can return http exceptions using exceptions", () => {
-  const context = mockContext();
-
   it("NotFoundException", async () => {
     const testHttpMethod = httpHandler(async () => {
       throw new NotFoundException();

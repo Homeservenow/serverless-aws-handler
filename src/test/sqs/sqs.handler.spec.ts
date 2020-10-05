@@ -1,8 +1,8 @@
 import { RecordResults, SQSHandleActions, SQSHandler } from "../../sqs";
 import AWS, { SQS } from "aws-sdk";
 import { mockSQSEvent, mockSQSRecord } from "../events/sqs.event";
-import mockContext from "aws-lambda-mock-context";
 import { SQSRecord } from "aws-lambda";
+import { context } from "./../events/mock.context";
 
 jest.mock("aws-sdk", () => {
   const SQSMocked: Partial<SQS> & { promise: any } = {
@@ -39,7 +39,6 @@ describe("SqsHandler", () => {
     const records = mockSQSEvent({
       Records: [mockSQSRecord({})],
     });
-    const context = mockContext();
 
     const handler = SQSHandler<Test>(sqs)(
       (record: Test): Promise<SQSHandleActions> => {
@@ -59,7 +58,6 @@ describe("SqsHandler", () => {
     const records = mockSQSEvent({
       Records: [mockSQSRecord({})],
     });
-    const context = mockContext();
 
     (sqs.deleteMessageBatch().promise as jest.MockedFunction<
       any
@@ -86,7 +84,6 @@ describe("SqsHandler", () => {
     const records = mockSQSEvent({
       Records: [mockSQSRecord({})],
     });
-    const context = mockContext();
 
     (sqs.deleteMessageBatch().promise as jest.MockedFunction<
       any

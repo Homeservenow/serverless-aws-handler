@@ -1,7 +1,7 @@
 import { httpHandler, HttpStatusCode, BadRequestException } from "../..";
 import { createMockAPIGatewayEvent } from "./../events";
-import mockContext from "aws-lambda-mock-context";
 import { APIGatewayProxyHandler } from "aws-lambda";
+import { context } from "./../events/mock.context";
 
 const testHttpMethod = httpHandler(async () => {
   return {
@@ -17,8 +17,6 @@ describe("PromisifiedAPIGatewayProxyHandler", () => {
 });
 
 describe("HttpHandler", () => {
-  const context = mockContext();
-
   it("Will return 200", async () => {
     const result = await testHttpMethod(createMockAPIGatewayEvent({}), context);
 

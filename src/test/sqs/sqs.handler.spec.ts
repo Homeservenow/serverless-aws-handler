@@ -134,7 +134,6 @@ describe("SqsHandler", () => {
         }),
       ],
     });
-    const context = mockContext();
 
     const handler = SQSHandler<Test>(sqs)({
       serialise: (record): Test => {

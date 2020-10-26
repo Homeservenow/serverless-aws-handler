@@ -28,7 +28,7 @@ type ConfigCacheSQSFunction = <R>(
 ) => (handler: SqsHandlerFunction<R>) => AWSSQSHandler;
 type ConfigCacheFunction = ConfigCacheHttpFunction | ConfigCacheSQSFunction;
 
-export const httpConfig: ConfigCacheHttpFunction = <T, R>(
+export const httpConfigFactory: ConfigCacheHttpFunction = <T, R>(
   options: HttpHandlerOptions<T, R>,
 ) => (handler: HttpHandlerFunction<T, R>) =>
   httpHandler({
@@ -36,7 +36,7 @@ export const httpConfig: ConfigCacheHttpFunction = <T, R>(
     handler,
   });
 
-export const sqsConfig: ConfigCacheSQSFunction = <R>(
+export const sqsConfigFactory: ConfigCacheSQSFunction = <R>(
   options: SqsHandlerOptionsInterface<R>,
 ) => (handler: SqsHandlerFunction<R>) =>
   SQSHandler<R>(options.SQS)({

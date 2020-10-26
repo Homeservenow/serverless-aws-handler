@@ -1,5 +1,5 @@
 import { SQSHandleActions } from "./../sqs";
-import { httpConfig, sqsConfig } from ".";
+import { httpConfigFactory, sqsConfigFactory } from ".";
 import { SQS } from "aws-sdk";
 
 jest.mock("aws-sdk", () => {
@@ -21,15 +21,15 @@ jest.mock("aws-sdk", () => {
 });
 
 describe("config functions", () => {
-  describe("httpConfig", () => {
+  describe("httpConfigFactory", () => {
     it("basic instance", () => {
-      const result = httpConfig({});
+      const result = httpConfigFactory({});
 
       expect(typeof result).toBe("function");
     });
 
     it("handler function", () => {
-      const result = httpConfig({});
+      const result = httpConfigFactory({});
 
       const handler = result(async () => {});
 
@@ -37,14 +37,14 @@ describe("config functions", () => {
     });
   });
 
-  describe("sqsConfig", () => {
+  describe("sqsConfigFactory", () => {
     let sqs: SQS;
     beforeAll(() => {
       sqs = new SQS();
     });
 
     it("basic instance", () => {
-      const result = sqsConfig({
+      const result = sqsConfigFactory({
         SQS: sqs,
       });
 
@@ -52,7 +52,7 @@ describe("config functions", () => {
     });
 
     it("handler function", () => {
-      const result = sqsConfig({
+      const result = sqsConfigFactory({
         SQS: sqs,
       });
 

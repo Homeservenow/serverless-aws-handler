@@ -20,7 +20,8 @@ $ yarn add @homeservenow/serverless-aws-handler
  - Strong types :muscle:
  - Completely customisable - use your favourite solutions
  - <a href="https://github.com/Homeservenow/serverless-http-handler#sqs-handler">SQS handling</a>
- 
+ - <a href="https://github.com/Homeservenow/serverless-http-handler#config-factories">Config Factories</a>
+
 ## Usage
 
  ```typescript

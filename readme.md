@@ -516,3 +516,34 @@ export const handler = sqsHandler<CustomType>(sqs)({
     },
 });
 ```
+
+## Config Factories
+
+It's possible to use the factory methods to cache configurations to avoid duplication.
+
+```ts
+import {httpConfigFactory} from '@homeservenow/serverless-aws-handler';
+
+const factory = httpConfigFactory({
+    logger: (
+        errorHandlingOptions: ErrorHandlingOptionsType,
+        error: Error | HttpErrorException,
+    ) => {
+        console.error(error);
+    },
+});
+
+export const oneHandler = factory(async () => {
+    return 'hello';
+});
+
+export const twoHandler = factory(async () => {
+    throw new Error('hello');
+    return 'hello';
+});
+
+export const threeHandler = factory(async () => {
+    return 'hello again';
+});
+```
+Each in the above example share the configuration options provided to the factory.

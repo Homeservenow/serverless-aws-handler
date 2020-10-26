@@ -6,3 +6,4 @@ export {
   LoggerInterface,
 } from "./http/logging.handler";
 export * from "./sqs";
+export * from './factories';

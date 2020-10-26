@@ -1,4 +1,4 @@
-import { SQSHandleActions } from "./../sqs";
+import { SQSHandleActions } from "../sqs";
 import { httpConfigFactory, sqsConfigFactory } from ".";
 import { SQS } from "aws-sdk";
 

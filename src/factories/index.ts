@@ -4,12 +4,12 @@ import {
   HttpHandlerFunction,
   HttpHandlerOptions as HttpHandlerOptionsWithHandler,
   PromisifiedAPIGatewayProxyHandler,
-} from "./../http";
+} from "../http";
 import {
   SQSHandler,
   SqsHandlerFunction,
   SqsHandlerOptionsInterface as SqsHandlerOptionsInterfaceWithHandler,
-} from "./../sqs";
+} from "../sqs";
 import { SQSHandler as AWSSQSHandler } from "aws-lambda";
 
 type SqsHandlerOptionsInterface<T> = Partial<

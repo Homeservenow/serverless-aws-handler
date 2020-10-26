@@ -20,15 +20,15 @@ type HttpHandlerOptions<T, R> = Omit<
   "handler"
 >;
 
-type ConfigCacheHttpFunction = <T, R>(
+type ConfigFactoryHttpFunction = <T, R>(
   options: HttpHandlerOptions<T, R>,
 ) => (handler: HttpHandlerFunction<T, R>) => PromisifiedAPIGatewayProxyHandler;
 type ConfigCacheSQSFunction = <R>(
   options: SqsHandlerOptionsInterface<R>,
 ) => (handler: SqsHandlerFunction<R>) => AWSSQSHandler;
-type ConfigCacheFunction = ConfigCacheHttpFunction | ConfigCacheSQSFunction;
+type ConfigFactoryFunction = ConfigFactoryHttpFunction | ConfigCacheSQSFunction;
 
-export const httpConfigFactory: ConfigCacheHttpFunction = <T, R>(
+export const httpConfigFactory: ConfigFactoryHttpFunction = <T, R>(
   options: HttpHandlerOptions<T, R>,
 ) => (handler: HttpHandlerFunction<T, R>) =>
   httpHandler({
